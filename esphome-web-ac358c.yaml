@@ -47,37 +47,24 @@ binary_sensor:
         input: true
     name: "Movement"
     device_class: motion
-    
-# number:
-#   - platform: template
-#     id: gear_threshold
-#     name: "Template number"
-#     optimistic: true
-#     min_value: 0
-#     max_value: 10
-#     step: 1
-#     on_value_range:
-#       above: 5
-#       below: 10
-#       then: 
-#         - uart.write: [0x55, 0x08, 0x00, 0x02, 0x04, 0x0C, 0x02, 0xDB, 0xF5]
 
-#     # on_value_range:
-#     #   above: 0
-#     #   below: 4
-#     #   then: 
-#     #     - uart.write: [0x55, 0x07, 0x00, 0x01, 0x04, 0x0C, 0xEA, 0xDB]
-#     on_value:
-#       if:
-#         condition:
-#           number.in_range:
-#             id: gear_threshold
-#             below: 5
-#         then:
-#           - uart.write: [0x55, 0x07, 0x00, 0x01, 0x04, 0x0C, 0xEA, 0xDB]
-#     # on_value:
-#     #   then:
-#     #     - uart.write: [0x55, 0x07, 0x00, 0x01, 0x04, 0x0C, 0xEA, 0xDB]
+select:
+  - platform: template
+    name: "Scene (0x04, 0x10)"
+    id: select_scene
+    options:
+     - "Default (0x00)"
+     - "Area detection (top mounted) (0x01)"
+     - "Toilet (top mounted) (0x02)"
+     - "Bedroom (top loading) (0x03)"
+     - "Bedroom (top mounted) (0x04)"
+     - "Bedroom (top mounted) (0x05)"
+    initial_option: "Default (0x00)"
+    optimistic: true
+    set_action:
+      - logger.log:
+          format: "Chosen option: %s"
+          args: ["x.c_str()"]
 
 number:
   - platform: template
