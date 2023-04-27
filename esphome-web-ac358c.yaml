@@ -61,19 +61,12 @@ select:
      - "Bedroom (top mounted) (0x05)"
     initial_option: "Default (0x00)"
     optimistic: true
-    set_action:
+    on_value:
       then:
         - lambda: |-
             unsigned char b[1] = {0};
-            auto state = id(select_scene).state;
-            ESP_LOGD("packet", "state: %s", id(select_scene).state);
-            const char* selected_scene = (const char*)(&state);
-            unsigned short int selected_scene_int = 0x00;
-            if (strcmp(selected_scene, "Area detection (top mounted) (0x01)") == 0) {
-              selected_scene_int = 0x01;
-            }
-            ESP_LOGD("packet", "selected_scene_int: %s", selected_scene_int);
-            b[0] = selected_scene_int;
+            ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
+            b[0] = i;
             unsigned char packet[100] = {0};
             unsigned short int packet_len = get_packet(0x02, 0x04, 0x10, b, 1, packet, 100);
             ESP_LOGD("crc", "packet_len: %d", packet_len);
