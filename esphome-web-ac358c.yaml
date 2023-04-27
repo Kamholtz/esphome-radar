@@ -50,7 +50,7 @@ binary_sensor:
     
 # number:
 #   - platform: template
-#     id: aa
+#     id: gear_threshold
 #     name: "Template number"
 #     optimistic: true
 #     min_value: 0
@@ -71,7 +71,7 @@ binary_sensor:
 #       if:
 #         condition:
 #           number.in_range:
-#             id: aa
+#             id: gear_threshold
 #             below: 5
 #         then:
 #           - uart.write: [0x55, 0x07, 0x00, 0x01, 0x04, 0x0C, 0xEA, 0xDB]
@@ -81,10 +81,10 @@ binary_sensor:
 
 number:
   - platform: template
-    id: aa
-    name: "Template number"
+    id: gear_threshold
+    name: "Gear Threshold (0x04, 0x0C)"
     optimistic: true
-    min_value: 0
+    min_value: 1
     max_value: 10
     step: 1
     on_value:
@@ -94,7 +94,7 @@ number:
             auto out = us_CalculateCrc16(a, 2);
             ESP_LOGD("crc", "out: %x", out);
             unsigned char b[1] = {0};
-            b[0] = id(aa).state;
+            b[0] = id(gear_threshold).state;
             unsigned char packet[100] = {0};
             unsigned short int packet_len = get_packet(0x02, 0x04, 0x0C, b, 1, packet, 100);
             ESP_LOGD("crc", "packet_len: %d", packet_len);
