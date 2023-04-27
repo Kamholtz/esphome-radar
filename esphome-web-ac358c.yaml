@@ -1,0 +1,125 @@
+esphome:
+  name: esphome-web-ac358c
+  includes:
+    - crc.h
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-Ac358C"
+    password: "XtB9tpm6aSBQ"
+
+captive_portal:
+    
+    
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 16
+      mode:
+        input: true
+        pullup: false
+    name: "Presence"
+    device_class: presence
+    filters:
+      - delayed_on_off: 10ms
+  - platform: gpio
+    pin:
+      number: 17
+      mode:
+        input: true
+    name: "Movement"
+    device_class: motion
+    
+# number:
+#   - platform: template
+#     id: aa
+#     name: "Template number"
+#     optimistic: true
+#     min_value: 0
+#     max_value: 10
+#     step: 1
+#     on_value_range:
+#       above: 5
+#       below: 10
+#       then: 
+#         - uart.write: [0x55, 0x08, 0x00, 0x02, 0x04, 0x0C, 0x02, 0xDB, 0xF5]
+
+#     # on_value_range:
+#     #   above: 0
+#     #   below: 4
+#     #   then: 
+#     #     - uart.write: [0x55, 0x07, 0x00, 0x01, 0x04, 0x0C, 0xEA, 0xDB]
+#     on_value:
+#       if:
+#         condition:
+#           number.in_range:
+#             id: aa
+#             below: 5
+#         then:
+#           - uart.write: [0x55, 0x07, 0x00, 0x01, 0x04, 0x0C, 0xEA, 0xDB]
+#     # on_value:
+#     #   then:
+#     #     - uart.write: [0x55, 0x07, 0x00, 0x01, 0x04, 0x0C, 0xEA, 0xDB]
+
+number:
+  - platform: template
+    id: aa
+    name: "Template number"
+    optimistic: true
+    min_value: 0
+    max_value: 10
+    step: 1
+    on_value:
+      then:
+        - lambda: |-
+            unsigned char a[] = {0x01, 0x02};
+            auto out = us_CalculateCrc16(a, 2);
+            ESP_LOGD("crc", "out: %x", out);
+            unsigned char b[1] = {0};
+            b[0] = id(aa).state;
+            unsigned char packet[100] = {0};
+            unsigned short int packet_len = get_packet(0x02, 0x04, 0x0C, b, 1, packet, 100);
+            ESP_LOGD("crc", "packet_len: %d", packet_len);
+            unsigned short int ii = 0;
+            for (ii = 0; ii < packet_len; ii++) {
+              ESP_LOGD("packet", "ii: %d, %X", ii, packet[ii]);
+            }
+            id(radar_id).write_array(packet, packet_len);
+
+
+uart:
+  id: radar_id
+  tx_pin: 14
+  rx_pin: 27
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+  debug:
+    direction: BOTH
+    dummy_receiver: false
+    after:
+      timeout: 0.01s
+    sequence:
+      - lambda: UARTDebug::log_string(direction, bytes);
+      
+      
+
