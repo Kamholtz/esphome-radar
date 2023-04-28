@@ -3,6 +3,70 @@
 
 #define MAX_PACKET_LEN 50
 
+enum function_code {
+    read_command = 0x01,
+    write_command = 0x02,
+    passive_report_command = 0x03,
+    actively_report_command = 0x04,
+};
+
+
+enum address_code_1 {
+    // -- read
+    id_query = 0x01,
+    radar_information_query = 0x03,
+    system_parameter = 0x04,
+
+    // -- write
+    // system_parameter = 0x04,
+    other_functions = 0x05,
+
+    // -- passive_report
+    reporting_module = 0x01,
+    report_radar_information = 0x03,
+    report_system_parameters = 0x04,
+    // report_other_information = ???
+
+    // -- actively report command
+    // report_radar_information = 0x03,
+    report_other_information = 0x05,
+
+};
+
+enum address_code_2 {
+    // -- read
+    device_id = 0x01,
+    software_version = 0x02,
+    hardware_version = 0x03,
+    protocol_version = 0x04,
+
+    environment_status = 0x05,
+    physical_parameters = 0x06,
+
+    threshold_gear = 0x0C,
+    scene_setting = 0x10,
+    force_into_unmanned_stall = 0x12,
+
+    // TODO: continue
+    // -- write
+    // threshold_gear = 0x0C,
+    // scene_setting = 0x10,
+    // force_into_unmanned_stall = 0x12,
+
+    // -- passive_report
+    // reporting_module = 0x01,
+    // report_radar_information = 0x03,
+    // report_system_parameters = 0x04,
+    // report_other_information = ???
+
+    // -- actively report command
+    // report_radar_information = 0x03,
+    // report_other_information = 0x05,
+
+};
+
+
+
 const unsigned char cuc_CRCHi[256] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
