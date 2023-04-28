@@ -68,6 +68,22 @@ select:
             unsigned char b[1] = {0};
             b[0] = i;
             write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
+button:
+  - platform: template
+    name: Force unmanned stall
+    id: unmanned_stall_button
+
+    # Optional variables:
+    icon: "mdi:emoticon-outline"
+    on_press:
+      then:
+        - lambda: |-
+            ESP_LOGD("packet", "force_into_unmanned_stall: ");
+            // this actuall reads whether there is an unmanned stall
+            // write_to_uart(read_command, system_parameter, force_into_unmanned_stall, NULL, 0, id(radar_id));
+            unsigned char b[1] = {0};
+            b[0] = 0x01;
+            write_to_uart(write_command, system_parameter, force_into_unmanned_stall, b, 1, id(radar_id));
 
 number:
   - platform: template

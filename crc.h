@@ -174,7 +174,7 @@ static unsigned short int write_to_uart(unsigned char function_code,
                                      UARTDevice uart_device) {
 
     unsigned char packet[MAX_PACKET_LEN] = {0};
-    unsigned short int packet_len = get_packet(0x02, 0x04, 0x10, data, data_len, packet, MAX_PACKET_LEN);
+    unsigned short int packet_len = get_packet(function_code, address_code_1, address_code_2, data, data_len, packet, MAX_PACKET_LEN);
 
     unsigned short int ii = 0;
     ESP_LOGD("crc", "packet_len: %d", packet_len);
