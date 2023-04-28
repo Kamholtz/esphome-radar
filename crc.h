@@ -1,4 +1,7 @@
 #include "esphome.h"
+#include "esphome/components/uart/uart.h"
+
+#define MAX_PACKET_LEN 50
 
 const unsigned char cuc_CRCHi[256] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
@@ -62,6 +65,9 @@ static unsigned short int us_CalculateCrc16(unsigned char *lpuc_Frame,
   return (unsigned short int)(luc_CRCLo << 8 | luc_CRCHi);
 }
 
+
+
+
 static unsigned short int get_packet(unsigned char function_code,
                                      unsigned char address_code_1,
                                      unsigned char address_code_2,
@@ -94,4 +100,25 @@ static unsigned short int get_packet(unsigned char function_code,
     buf_out[ii] = (crc) & 0xFF; ii++;
 
     return ii; // final packet len
+}
+
+static unsigned short int write_to_uart(unsigned char function_code,
+                                     unsigned char address_code_1,
+                                     unsigned char address_code_2,
+                                     unsigned char *data,
+                                     unsigned short int data_len,
+                                     UARTDevice uart_device) {
+
+    unsigned char packet[MAX_PACKET_LEN] = {0};
+    unsigned short int packet_len = get_packet(0x02, 0x04, 0x10, data, data_len, packet, MAX_PACKET_LEN);
+
+    unsigned short int ii = 0;
+    ESP_LOGD("crc", "packet_len: %d", packet_len);
+    for (ii = 0; ii < packet_len; ii++) {
+      ESP_LOGD("packet", "ii: %d, %X", ii, packet[ii]);
+    }
+
+    uart_device.write_array(packet, packet_len);
+
+    return packet_len;
 }
