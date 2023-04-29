@@ -91,7 +91,7 @@ button:
     id: unmanned_stall_button
 
     # Optional variables:
-    icon: "mdi:emoticon-outline"
+    icon: "mdi:close-circle-outline"
     on_press:
       then:
         - lambda: |-
@@ -146,6 +146,6 @@ uart:
       timeout: 0.01s
     sequence:
       - lambda: UARTDebug::log_string(direction, bytes);
-      
-      
+
+
 
