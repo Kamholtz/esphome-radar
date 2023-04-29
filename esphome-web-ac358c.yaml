@@ -91,6 +91,8 @@ button:
     id: unmanned_stall_button
 
     # Optional variables:
+    # find more:
+    # https://icon-sets.iconify.design/mdi/close-circle-outline/
     icon: "mdi:close-circle-outline"
     on_press:
       then:
