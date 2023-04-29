@@ -3,7 +3,8 @@
 
 #define MAX_PACKET_LEN 50
 
-enum function_code {
+// function code
+enum class function_code {
     read_command = 0x01,
     write_command = 0x02,
     passive_report_command = 0x03,
@@ -11,29 +12,29 @@ enum function_code {
 };
 
 
-enum address_code_1 {
-    // -- read
+// address code 1
+enum class read_address_code_1 {
     id_query = 0x01,
     radar_information_query = 0x03,
     system_parameter = 0x04,
-
-    // -- write
-    // system_parameter = 0x04,
+};
+enum class write_address_code_1 {
+    system_parameter = 0x04,
     other_functions = 0x05,
-
-    // -- passive_report
+};
+enum class passive_report_address_code_1 {
     reporting_module = 0x01,
     report_radar_information = 0x03,
     report_system_parameters = 0x04,
     // report_other_information = ???
-
-    // -- actively report command
-    // report_radar_information = 0x03,
+};
+enum class active_report_address_code_1 {
+    report_radar_information = 0x03,
     report_other_information = 0x05,
-
 };
 
-enum address_code_2 {
+// address code 2
+enum class address_code_2 {
     // -- read
     device_id = 0x01,
     software_version = 0x02,
@@ -65,7 +66,7 @@ enum address_code_2 {
 
 };
 
-enum unmanned_stall_data_0 {
+enum class unmanned_stall_data_0 {
     unmanned_no_coersion = 0x00,
     unmanned_10s = 0X01,
     unmanned_30s = 0X02,
