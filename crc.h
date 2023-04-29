@@ -65,7 +65,17 @@ enum address_code_2 {
 
 };
 
-
+enum unmanned_stall_data_0 {
+    unmanned_no_coersion = 0x00,
+    unmanned_10s = 0X01,
+    unmanned_30s = 0X02,
+    unmanned_1min = 0X03,
+    unmanned_2min = 0X04,
+    unmanned_5min = 0X05,
+    unmanned_10min = 0X06,
+    unmanned_30min = 0X07,
+    unmanned_60min = 0X08,
+};
 
 const unsigned char cuc_CRCHi[256] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,

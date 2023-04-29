@@ -68,6 +68,23 @@ select:
             unsigned char b[1] = {0};
             b[0] = i;
             write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
+
+  - platform: template
+    name: "Unmanned stall option"
+    id: select_unmanned_stall
+    options:
+     - "no coersion - (0x00)"
+     - "10s - (0X01)"
+     - "30s - (0X02)"
+     - "1min - (0X03)"
+     - "2min - (0X04)"
+     - "5min - (0X05)"
+     - "10min - (0X06)"
+     - "30min - (0X07)"
+     - "60min - (0X08)"
+    initial_option: "no coersion - (0x00)"
+    optimistic: true
+
 button:
   - platform: template
     name: Force unmanned stall
@@ -82,8 +99,11 @@ button:
             // this actuall reads whether there is an unmanned stall
             // write_to_uart(read_command, system_parameter, force_into_unmanned_stall, NULL, 0, id(radar_id));
             unsigned char b[1] = {0};
-            b[0] = 0x01;
-            write_to_uart(write_command, system_parameter, force_into_unmanned_stall, b, 1, id(radar_id));
+            auto index = id(select_unmanned_stall).active_index();
+            if (index) {
+              b[0] = *index;
+              write_to_uart(write_command, system_parameter, force_into_unmanned_stall, b, 1, id(radar_id));
+            }
 
 number:
   - platform: template
