@@ -12,7 +12,10 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
   public:
     sensor::Sensor *sensor1 = new sensor::Sensor();
-    // void setup() override;
+    void setup() override;
+    void dump_config() override;
+    void loop() override;
+
 
 
 };

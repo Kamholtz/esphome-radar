@@ -3,6 +3,7 @@ esphome:
   includes:
     - crc.h
     - r24avd1.h
+    - r24avd1.cpp
 
 esp32:
   board: esp32dev
