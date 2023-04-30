@@ -78,7 +78,7 @@ enum class UnmannedStallData0 {
     UNMANNED_60MIN = 0X08,
 };
 
-const unsigned char cuc_CRCHi[256] = {
+const unsigned char CUC_CRC_HI[256] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x00, 0xC1, 0x81, 0x40,
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
@@ -102,7 +102,7 @@ const unsigned char cuc_CRCHi[256] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
     0x00, 0xC1, 0x81, 0x40};
 
-const unsigned char cuc_CRCLo[256] = {
+const unsigned char CUC_CRC_LO[256] = {
     0x00, 0xC0, 0xC1, 0x01, 0xC3, 0x03, 0x02, 0xC2, 0xC6, 0x06, 0x07, 0xC7,
     0x05, 0xC5, 0xC4, 0x04, 0xCC, 0x0C, 0x0D, 0xCD, 0x0F, 0xCF, 0xCE, 0x0E,
     0x0A, 0xCA, 0xCB, 0x0B, 0xC9, 0x09, 0x08, 0xC8, 0xD8, 0x18, 0x19, 0xD9,
@@ -126,18 +126,18 @@ const unsigned char cuc_CRCLo[256] = {
     0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83,
     0x41, 0x81, 0x80, 0x40};
 
-static unsigned short int us_CalculateCrc16(unsigned char *lpuc_Frame,
-                                            unsigned short int lus_Len) {
-  unsigned char luc_CRCHi = 0xFF;
-  unsigned char luc_CRCLo = 0xFF;
-  int li_Index = 0;
+static unsigned short int us_calculate_crc16(unsigned char *lpuc_frame,
+                                             unsigned short int lus_len) {
+  unsigned char luc_crc_hi = 0xFF;
+  unsigned char luc_crc_lo = 0xFF;
+  int li_index = 0;
 
-  while (lus_Len--) {
-    li_Index = luc_CRCLo ^ *(lpuc_Frame++);
-    luc_CRCLo = (unsigned char)(luc_CRCHi ^ cuc_CRCHi[li_Index]);
-    luc_CRCHi = cuc_CRCLo[li_Index];
+  while (lus_len--) {
+    li_index = luc_crc_lo ^ *(lpuc_frame++);
+    luc_crc_lo = (unsigned char)(luc_crc_hi ^ CUC_CRC_HI[li_index]);
+    luc_crc_hi = CUC_CRC_LO[li_index];
   }
-  return (unsigned short int)(luc_CRCLo << 8 | luc_CRCHi);
+  return (unsigned short int)(luc_crc_lo << 8 | luc_crc_hi);
 }
 
 
@@ -156,25 +156,25 @@ static unsigned short int get_packet(unsigned char function_code,
         // error
         return -1;
     }
-    unsigned short int ii = 0;
-    buf_out[ii] = 0x55; ii++;
-    buf_out[ii] = (total_length - 1) & 0xFF; ii++; // low
-    buf_out[ii] = ((total_length - 1) >> 8) & 0xFF; ii++; // high
-    buf_out[ii] = function_code; ii++;
-    buf_out[ii] = address_code_1; ii++;
-    buf_out[ii] = address_code_2; ii++;
+    unsigned short int buf_out_ii = 0;
+    buf_out[buf_out_ii] = 0x55; buf_out_ii++;
+    buf_out[buf_out_ii] = (total_length - 1) & 0xFF; buf_out_ii++; // low
+    buf_out[buf_out_ii] = ((total_length - 1) >> 8) & 0xFF; buf_out_ii++; // high
+    buf_out[buf_out_ii] = function_code; buf_out_ii++;
+    buf_out[buf_out_ii] = address_code_1; buf_out_ii++;
+    buf_out[buf_out_ii] = address_code_2; buf_out_ii++;
 
-    unsigned short int jj = 0;
-    for (jj = 0; jj < data_len; jj++) {
-        buf_out[ii] = data[jj];
-        ii++;
+    unsigned short int buf_out_jj = 0;
+    for (buf_out_jj = 0; buf_out_jj < data_len; buf_out_jj++) {
+        buf_out[buf_out_ii] = data[buf_out_jj];
+        buf_out_ii++;
     }
 
-    unsigned short int crc = us_CalculateCrc16(buf_out, ii);
-    buf_out[ii] = (crc >> 8) & 0xFF; ii++;
-    buf_out[ii] = (crc) & 0xFF; ii++;
+    unsigned short int crc = us_calculate_crc16(buf_out, buf_out_ii);
+    buf_out[buf_out_ii] = (crc >> 8) & 0xFF; buf_out_ii++;
+    buf_out[buf_out_ii] = (crc) & 0xFF; buf_out_ii++;
 
-    return ii; // final packet len
+    return buf_out_ii; // final packet len
 }
 
 static unsigned short int write_to_uart(unsigned char function_code,

@@ -118,9 +118,6 @@ number:
     on_value:
       then:
         - lambda: |-
-            unsigned char a[] = {0x01, 0x02};
-            auto out = us_CalculateCrc16(a, 2);
-            ESP_LOGD("crc", "out: %x", out);
             unsigned char b[1] = {0};
             b[0] = id(gear_threshold).state;
             unsigned char packet[100] = {0};

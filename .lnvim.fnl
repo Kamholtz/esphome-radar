@@ -11,12 +11,14 @@
 
 
 
-(overseer.register_template {:name "esphome run radar"
+
+(overseer.register_template {:name "esphome run radar (local)"
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
                                          :args ["run" "--device" "esphome-web-ac358c.local"  "esphome-web-ac358c.yaml"]
                                          :name "esphome run radar"
                                          :env {}
+                                         :cwd (vim.fn.expand "%:h")
                                          ; :strategy {1 :jobstart :use_terminal false}
                                          })})
 
