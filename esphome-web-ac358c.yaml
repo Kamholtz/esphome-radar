@@ -67,7 +67,7 @@ select:
             ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
             unsigned char b[1] = {0};
             b[0] = i;
-            write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
+            rv24avd1::write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
 
   - platform: template
     name: "Unmanned stall option"
@@ -99,12 +99,12 @@ button:
         - lambda: |-
             ESP_LOGD("packet", "force_into_unmanned_stall: ");
             // this actuall reads whether there is an unmanned stall
-            // write_to_uart(read_command, system_parameter, force_into_unmanned_stall, NULL, 0, id(radar_id));
+            // rv24avd1::write_to_uart(read_command, system_parameter, force_into_unmanned_stall, NULL, 0, id(radar_id));
             unsigned char b[1] = {0};
             auto index = id(select_unmanned_stall).active_index();
             if (index) {
               b[0] = *index;
-              write_to_uart((unsigned char)FunctionCode::WRITE_COMMAND, (unsigned char)WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
+              rv24avd1::write_to_uart((unsigned char)rv24avd1::FunctionCode::WRITE_COMMAND, (unsigned char)rv24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)rv24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
             }
 
 number:
@@ -120,14 +120,8 @@ number:
         - lambda: |-
             unsigned char b[1] = {0};
             b[0] = id(gear_threshold).state;
-            unsigned char packet[100] = {0};
-            unsigned short int packet_len = get_packet(0x02, 0x04, 0x0C, b, 1, packet, 100);
-            ESP_LOGD("crc", "packet_len: %d", packet_len);
-            unsigned short int ii = 0;
-            for (ii = 0; ii < packet_len; ii++) {
-              ESP_LOGD("packet", "ii: %d, %X", ii, packet[ii]);
-            }
-            id(radar_id).write_array(packet, packet_len);
+            rv24avd1::write_to_uart((unsigned char)rv24avd1::FunctionCode::WRITE_COMMAND, (unsigned char)rv24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)rv24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
+
 
 
 uart:

@@ -1,5 +1,9 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
+#include "esphome/core/log.h"
+
+namespace esphome {
+namespace rv24avd1 {
 
 #define MAX_PACKET_LEN 50
 
@@ -143,10 +147,10 @@ static uint16_t us_calculate_crc16(unsigned char *lpuc_frame,
 
 
 
-static uint16_t get_packet(unsigned char function_code,
-                                     unsigned char address_code_1,
-                                     unsigned char address_code_2,
-                                     unsigned char *data,
+static uint16_t get_packet(uint8_t function_code,
+                                     uint8_t address_code_1,
+                                     uint8_t address_code_2,
+                                     const uint8_t *data,
                                      uint16_t data_len,
                                      unsigned char *buf_out,
                                      uint16_t buf_max_len) {
@@ -187,13 +191,16 @@ static uint16_t write_to_uart(unsigned char function_code,
     unsigned char packet[MAX_PACKET_LEN] = {0};
     uint16_t packet_len = get_packet(function_code, address_code_1, address_code_2, data, data_len, packet, MAX_PACKET_LEN);
 
-    uint16_t ii = 0;
+    uint16_t log_ii = 0;
     ESP_LOGD("crc", "packet_len: %d", packet_len);
-    for (ii = 0; ii < packet_len; ii++) {
-      ESP_LOGD("packet", "ii: %d, %X", ii, packet[ii]);
+    for (log_ii = 0; log_ii < packet_len; log_ii++) {
+      ESP_LOGD("packet", "log_ii: %d, %X", log_ii, packet[log_ii]);
     }
 
     uart_device.write_array(packet, packet_len);
 
     return packet_len;
 }
+
+}  // namespace rv24avd1
+}  // namespace esphome
