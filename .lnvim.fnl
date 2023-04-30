@@ -22,5 +22,12 @@
                                          ; :strategy {1 :jobstart :use_terminal false}
                                          })})
 
-
-
+(overseer.register_template {:name "esphome compile radar"
+                             :builder (fn [params] 
+                                        {:cmd ["esphome"]
+                                         :args ["compile" "--only-generate" "esphome-web-ac358c.yaml"]
+                                         :name "esphome run radar"
+                                         :env {}
+                                         :cwd (vim.fn.expand "%:h")
+                                         ; :strategy {1 :jobstart :use_terminal false}
+                                         })})
