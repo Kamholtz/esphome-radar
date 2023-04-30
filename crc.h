@@ -1,81 +1,81 @@
-#include "esphome.h"
+#include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 
 #define MAX_PACKET_LEN 50
 
 // function code
-enum class function_code {
-    read_command = 0x01,
-    write_command = 0x02,
-    passive_report_command = 0x03,
-    actively_report_command = 0x04,
+enum class FunctionCode : uint8_t {
+    READ_COMMAND = 0x01,
+    WRITE_COMMAND = 0x02,
+    PASSIVE_REPORT_COMMAND = 0x03,
+    ACTIVELY_REPORT_COMMAND = 0x04,
 };
 
 
 // address code 1
-enum class read_address_code_1 {
-    id_query = 0x01,
-    radar_information_query = 0x03,
-    system_parameter = 0x04,
+enum class ReadAddressCode1 {
+    ID_QUERY = 0x01,
+    RADAR_INFORMATION_QUERY = 0x03,
+    SYSTEM_PARAMETER = 0x04,
 };
-enum class write_address_code_1 {
-    system_parameter = 0x04,
-    other_functions = 0x05,
+enum class WriteAddressCode1 {
+    SYSTEM_PARAMETER = 0x04,
+    OTHER_FUNCTIONS = 0x05,
 };
-enum class passive_report_address_code_1 {
-    reporting_module = 0x01,
-    report_radar_information = 0x03,
-    report_system_parameters = 0x04,
-    // report_other_information = ???
+enum class PassiveReportAddressCode1 {
+    REPORTING_MODULE = 0x01,
+    REPORT_RADAR_INFORMATION = 0x03,
+    REPORT_SYSTEM_PARAMETERS = 0x04,
+    // REPORT_OTHER_INFORMATION = ???
 };
-enum class active_report_address_code_1 {
-    report_radar_information = 0x03,
-    report_other_information = 0x05,
+enum class ActiveReportAddressCode1 {
+    REPORT_RADAR_INFORMATION = 0x03,
+    REPORT_OTHER_INFORMATION = 0x05,
 };
 
 // address code 2
-enum class address_code_2 {
+enum class AddressCode2 {
     // -- read
-    device_id = 0x01,
-    software_version = 0x02,
-    hardware_version = 0x03,
-    protocol_version = 0x04,
+    DEVICE_ID = 0x01,
+    SOFTWARE_VERSION = 0x02,
+    HARDWARE_VERSION = 0x03,
+    PROTOCOL_VERSION = 0x04,
 
-    environment_status = 0x05,
-    physical_parameters = 0x06,
+    ENVIRONMENT_STATUS = 0x05,
+    PHYSICAL_PARAMETERS = 0x06,
 
-    threshold_gear = 0x0C,
-    scene_setting = 0x10,
-    force_into_unmanned_stall = 0x12,
+    THRESHOLD_GEAR = 0x0C,
+    SCENE_SETTING = 0x10,
+    FORCE_INTO_UNMANNED_STALL = 0x12,
 
     // TODO: continue
     // -- write
-    // threshold_gear = 0x0C,
-    // scene_setting = 0x10,
-    // force_into_unmanned_stall = 0x12,
+    // THRESHOLD_GEAR = 0x0C,
+    // SCENE_SETTING = 0x10,
+    // FORCE_INTO_UNMANNED_STALL = 0x12,
 
     // -- passive_report
-    // reporting_module = 0x01,
-    // report_radar_information = 0x03,
-    // report_system_parameters = 0x04,
-    // report_other_information = ???
+    // REPORTING_MODULE = 0x01,
+    // REPORT_RADAR_INFORMATION = 0x03,
+    // REPORT_SYSTEM_PARAMETERS = 0x04,
+    // REPORT_OTHER_INFORMATION = ???
 
     // -- actively report command
-    // report_radar_information = 0x03,
-    // report_other_information = 0x05,
+    // REPORT_RADAR_INFORMATION = 0x03,
+    // REPORT_OTHER_INFORMATION = 0x05,
 
 };
 
-enum class unmanned_stall_data_0 {
-    unmanned_no_coersion = 0x00,
-    unmanned_10s = 0X01,
-    unmanned_30s = 0X02,
-    unmanned_1min = 0X03,
-    unmanned_2min = 0X04,
-    unmanned_5min = 0X05,
-    unmanned_10min = 0X06,
-    unmanned_30min = 0X07,
-    unmanned_60min = 0X08,
+enum class UnmannedStallData0 {
+    UNMANNED_NO_COERSION = 0x00,
+    UNMANNED_10S = 0X01,
+    UNMANNED_30S = 0X02,
+    UNMANNED_1MIN = 0X03,
+    UNMANNED_2MIN = 0X04,
+    UNMANNED_5MIN = 0X05,
+    UNMANNED_10MIN = 0X06,
+    UNMANNED_30MIN = 0X07,
+    UNMANNED_60MIN = 0X08,
 };
 
 const unsigned char cuc_CRCHi[256] = {
@@ -182,7 +182,7 @@ static unsigned short int write_to_uart(unsigned char function_code,
                                      unsigned char address_code_2,
                                      unsigned char *data,
                                      unsigned short int data_len,
-                                     UARTDevice uart_device) {
+                                     esphome::uart::UARTDevice uart_device) {
 
     unsigned char packet[MAX_PACKET_LEN] = {0};
     unsigned short int packet_len = get_packet(function_code, address_code_1, address_code_2, data, data_len, packet, MAX_PACKET_LEN);

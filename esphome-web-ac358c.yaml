@@ -104,7 +104,7 @@ button:
             auto index = id(select_unmanned_stall).active_index();
             if (index) {
               b[0] = *index;
-              write_to_uart((unsigned char)function_code::write_command, (unsigned char)write_address_code_1::system_parameter, (unsigned char)address_code_2::force_into_unmanned_stall, b, 1, id(radar_id));
+              write_to_uart((unsigned char)FunctionCode::WRITE_COMMAND, (unsigned char)WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
             }
 
 number:
