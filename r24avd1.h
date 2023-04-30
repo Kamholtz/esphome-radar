@@ -19,6 +19,7 @@ const uint8_t ADDRESS_CODE_2_IDX = 5;
 const uint8_t DATA_START_IDX = 6;
 const uint8_t DATA_MAX_LEN = 4;
 const uint8_t PACKET_MAX_LEN = 12;
+const uint8_t CRC_LEN = 2;
 
 using float_data = union {
   uint8_t data[4];

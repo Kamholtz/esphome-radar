@@ -60,18 +60,27 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
           ESP_LOGD(TAG, "crc_h: %X", crc_h);
           ESP_LOGD(TAG, "data_len: %d", data_len);
 
-          if (data_len > DATA_MAX_LEN) {
-            ESP_LOGI(TAG, "Data len (%d) too long, discarding", data_len);
-          } else  {
-            // we don't expect data_len to be larger than a 4 byte float
-            float_data float_data_union;
-            for (uint8_t data_ii = 0; data_ii < data_len; data_ii++) {
-              float_data_union.data[data_ii] = buffer[DATA_START_IDX + data_ii];
+          uint16_t calculated_crc = crc::us_calculate_crc16(buffer, pkt_len_incl_start - CRC_LEN);
+          if ((((calculated_crc >> 8) & 0xFF) == crc_l) &&
+              (((calculated_crc & 0xFF)) == crc_h)) {
+
+            if (data_len > DATA_MAX_LEN) {
+              ESP_LOGI(TAG, "Data len (%d) too long, discarding", data_len);
+            } else  {
+              // we don't expect data_len to be larger than a 4 byte float
+              float_data float_data_union;
+              for (uint8_t data_ii = 0; data_ii < data_len; data_ii++) {
+                float_data_union.data[data_ii] = buffer[DATA_START_IDX + data_ii];
+              }
+
+              ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_union.data[0], float_data_union.data[1], float_data_union.data[2], float_data_union.data[3]);
+              ESP_LOGD(TAG, "float_data_union: %f", float_data_union.f);
             }
 
-            ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_union.data[0], float_data_union.data[1], float_data_union.data[2], float_data_union.data[3]);
-            ESP_LOGD(TAG, "float_data_union: %f", float_data_union.f);
+          } else {
+            ESP_LOGD(TAG, "CRC failed %X", calculated_crc);
           }
+
 
           // finished parsing
           pos = 0;
