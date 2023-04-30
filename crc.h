@@ -3,7 +3,7 @@
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace rv24avd1 {
+namespace crc {
 
 #define MAX_PACKET_LEN 50
 
@@ -202,5 +202,5 @@ static uint16_t write_to_uart(unsigned char function_code,
     return packet_len;
 }
 
-}  // namespace rv24avd1
+}  // namespace crc
 }  // namespace esphome

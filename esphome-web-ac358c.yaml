@@ -67,7 +67,7 @@ select:
             ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
             unsigned char b[1] = {0};
             b[0] = i;
-            rv24avd1::write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
+            crc::write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
 
   - platform: template
     name: "Unmanned stall option"
@@ -99,12 +99,12 @@ button:
         - lambda: |-
             ESP_LOGD("packet", "force_into_unmanned_stall: ");
             // this actuall reads whether there is an unmanned stall
-            // rv24avd1::write_to_uart(read_command, system_parameter, force_into_unmanned_stall, NULL, 0, id(radar_id));
+            // crc::write_to_uart(read_command, system_parameter, force_into_unmanned_stall, NULL, 0, id(radar_id));
             unsigned char b[1] = {0};
             auto index = id(select_unmanned_stall).active_index();
             if (index) {
               b[0] = *index;
-              rv24avd1::write_to_uart((unsigned char)rv24avd1::FunctionCode::WRITE_COMMAND, (unsigned char)rv24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)rv24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
+              crc::write_to_uart((unsigned char)crc::FunctionCode::WRITE_COMMAND, (unsigned char)crc::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)crc::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
             }
 
 number:
@@ -120,7 +120,7 @@ number:
         - lambda: |-
             unsigned char b[1] = {0};
             b[0] = id(gear_threshold).state;
-            rv24avd1::write_to_uart((unsigned char)rv24avd1::FunctionCode::WRITE_COMMAND, (unsigned char)rv24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)rv24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
+            crc::write_to_uart((unsigned char)crc::FunctionCode::WRITE_COMMAND, (unsigned char)crc::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)crc::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
 
 
 
