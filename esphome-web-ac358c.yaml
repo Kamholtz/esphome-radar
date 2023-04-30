@@ -146,7 +146,7 @@ uart:
 sensor:
 - platform: custom
   lambda: |-
-    auto my_sensor = new r24avd1::R24AVD1Component();
+    auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
     App.register_component(my_sensor);
     return {my_sensor->sensor1};
 
