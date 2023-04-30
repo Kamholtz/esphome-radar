@@ -8,8 +8,10 @@ namespace esphome {
 namespace r24avd1 {
 
 
-class R24AVD1Component : public Component, public sensor::Sensor, public uart::UARTDevice {
+class R24AVD1Component : public Component, public uart::UARTDevice {
 
+  public:
+    sensor::Sensor *sensor1 = new sensor::Sensor();
 
 };
 }  // namespace r24avd1
