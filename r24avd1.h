@@ -16,7 +16,7 @@ const uint8_t ADDRESS_LEN = 2;
 const uint8_t FUNCTION_CODE_IDX = 3;
 const uint8_t ADDRESS_CODE_1_IDX = 4;
 const uint8_t ADDRESS_CODE_2_IDX = 5;
-const uint8_t DATA_START_IDX = 5;
+const uint8_t DATA_START_IDX = 6;
 const uint8_t DATA_MAX_LEN = 4;
 const uint8_t PACKET_MAX_LEN = 12;
 
