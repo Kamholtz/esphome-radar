@@ -2,6 +2,7 @@ esphome:
   name: esphome-web-ac358c
   includes:
     - crc.h
+    - r24avd1.h
 
 esp32:
   board: esp32dev
@@ -141,4 +142,16 @@ uart:
       - lambda: UARTDebug::log_string(direction, bytes);
 
 
+sensor:
+- platform: custom
+  lambda: |-
+    auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
+    App.register_component(my_sensor);
+    return {my_sensor->sensor1};
 
+  sensors:
+  - name: "My Custom Temperature Sensor"
+    unit_of_measurement: °C
+    accuracy_decimals: 1
+
+  # id: radar_new_id
