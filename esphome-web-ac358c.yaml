@@ -145,9 +145,9 @@ uart:
 sensor:
 - platform: custom
   lambda: |-
-    auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
+    auto my_sensor = new r24avd1::R24AVD1Component();
     App.register_component(my_sensor);
-    return {my_sensor->sensor1};
+    return {my_sensor};
 
   sensors:
   - name: "My Custom Temperature Sensor"
