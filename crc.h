@@ -126,8 +126,8 @@ const unsigned char CUC_CRC_LO[256] = {
     0x44, 0x84, 0x85, 0x45, 0x87, 0x47, 0x46, 0x86, 0x82, 0x42, 0x43, 0x83,
     0x41, 0x81, 0x80, 0x40};
 
-static unsigned short int us_calculate_crc16(unsigned char *lpuc_frame,
-                                             unsigned short int lus_len) {
+static uint16_t us_calculate_crc16(unsigned char *lpuc_frame,
+                                             uint16_t lus_len) {
   unsigned char luc_crc_hi = 0xFF;
   unsigned char luc_crc_lo = 0xFF;
   int li_index = 0;
@@ -137,26 +137,26 @@ static unsigned short int us_calculate_crc16(unsigned char *lpuc_frame,
     luc_crc_lo = (unsigned char)(luc_crc_hi ^ CUC_CRC_HI[li_index]);
     luc_crc_hi = CUC_CRC_LO[li_index];
   }
-  return (unsigned short int)(luc_crc_lo << 8 | luc_crc_hi);
+  return (uint16_t)(luc_crc_lo << 8 | luc_crc_hi);
 }
 
 
 
 
-static unsigned short int get_packet(unsigned char function_code,
+static uint16_t get_packet(unsigned char function_code,
                                      unsigned char address_code_1,
                                      unsigned char address_code_2,
                                      unsigned char *data,
-                                     unsigned short int data_len,
+                                     uint16_t data_len,
                                      unsigned char *buf_out,
-                                     unsigned short int buf_max_len) {
+                                     uint16_t buf_max_len) {
 
-    unsigned short int total_length = (8 + data_len);
+    uint16_t total_length = (8 + data_len);
     if (total_length > buf_max_len) {
         // error
         return -1;
     }
-    unsigned short int buf_out_ii = 0;
+    uint16_t buf_out_ii = 0;
     buf_out[buf_out_ii] = 0x55; buf_out_ii++;
     buf_out[buf_out_ii] = (total_length - 1) & 0xFF; buf_out_ii++; // low
     buf_out[buf_out_ii] = ((total_length - 1) >> 8) & 0xFF; buf_out_ii++; // high
@@ -164,30 +164,30 @@ static unsigned short int get_packet(unsigned char function_code,
     buf_out[buf_out_ii] = address_code_1; buf_out_ii++;
     buf_out[buf_out_ii] = address_code_2; buf_out_ii++;
 
-    unsigned short int buf_out_jj = 0;
+    uint16_t buf_out_jj = 0;
     for (buf_out_jj = 0; buf_out_jj < data_len; buf_out_jj++) {
         buf_out[buf_out_ii] = data[buf_out_jj];
         buf_out_ii++;
     }
 
-    unsigned short int crc = us_calculate_crc16(buf_out, buf_out_ii);
+    uint16_t crc = us_calculate_crc16(buf_out, buf_out_ii);
     buf_out[buf_out_ii] = (crc >> 8) & 0xFF; buf_out_ii++;
     buf_out[buf_out_ii] = (crc) & 0xFF; buf_out_ii++;
 
     return buf_out_ii; // final packet len
 }
 
-static unsigned short int write_to_uart(unsigned char function_code,
+static uint16_t write_to_uart(unsigned char function_code,
                                      unsigned char address_code_1,
                                      unsigned char address_code_2,
                                      unsigned char *data,
-                                     unsigned short int data_len,
+                                     uint16_t data_len,
                                      esphome::uart::UARTDevice uart_device) {
 
     unsigned char packet[MAX_PACKET_LEN] = {0};
-    unsigned short int packet_len = get_packet(function_code, address_code_1, address_code_2, data, data_len, packet, MAX_PACKET_LEN);
+    uint16_t packet_len = get_packet(function_code, address_code_1, address_code_2, data, data_len, packet, MAX_PACKET_LEN);
 
-    unsigned short int ii = 0;
+    uint16_t ii = 0;
     ESP_LOGD("crc", "packet_len: %d", packet_len);
     for (ii = 0; ii < packet_len; ii++) {
       ESP_LOGD("packet", "ii: %d, %X", ii, packet[ii]);
