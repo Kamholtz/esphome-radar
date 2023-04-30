@@ -19,7 +19,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
 
   protected:
-    void readline_(int readch, uint8_t *buffer, int len); 
+    int readline_(int readch, uint8_t *buffer, int len, int initial_pos); 
 
 };
 }  // namespace r24avd1

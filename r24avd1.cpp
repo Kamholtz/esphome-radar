@@ -15,16 +15,17 @@ void R24AVD1Component::loop() {
   const int max_line_length = 80;
   static uint8_t buffer[max_line_length];
 
+  int pos = 0;
   while (available()) {
-    this->readline_(read(), buffer, max_line_length);
+    pos = this->readline_(read(), buffer, max_line_length, pos);
   }
 }
 
-void R24AVD1Component::readline_(int readch, uint8_t *buffer, int len) {
-  static int pos = 0;
+int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initial_pos) {
+  int pos = initial_pos;
 
   if (readch >= 0) {
-    ESP_LOGD(TAG, "%c", readch);
+    // ESP_LOGD(TAG, "%c", readch);
     if (pos < len - 1) {
       buffer[pos++] = readch;
       buffer[pos] = 0;
@@ -51,6 +52,8 @@ void R24AVD1Component::readline_(int readch, uint8_t *buffer, int len) {
       }
     }
   }
+
+  return pos;
 }
 
 
