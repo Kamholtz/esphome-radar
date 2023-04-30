@@ -5,6 +5,9 @@ namespace r24avd1 {
 
 static const char *const TAG = "r24avd1";
 
+// void R24AVD1Component::setup() {
+// }
+
 
 }  // namespace r24avd1
 }  // namespace esphome
