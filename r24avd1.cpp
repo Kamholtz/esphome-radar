@@ -107,8 +107,10 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                     state_str = "";
                     break;
                 }
-                
-                this->approach_text_sensor_->publish_state(state_str);
+
+                if (this->approach_text_sensor_->get_state() != state_str) {
+                  this->approach_text_sensor_->publish_state(state_str);
+                }
               }
 
 
