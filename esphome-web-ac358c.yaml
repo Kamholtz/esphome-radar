@@ -148,11 +148,18 @@ sensor:
   lambda: |-
     auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
     App.register_component(my_sensor);
-    return {my_sensor->sensor1};
+    return {my_sensor->sensor1, my_sensor->approach_status};
 
   sensors:
   - name: "Movement sign parameter"
     unit_of_measurement: '%'
     accuracy_decimals: 0
+  - name: "Approach status"
+    device_class: 'enum'
+    options:
+     - ""
+     - "None"
+     - "Close"
+     - "Far away"
 
   # id: radar_new_id
