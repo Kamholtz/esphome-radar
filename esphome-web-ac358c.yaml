@@ -144,16 +144,21 @@ uart:
 
 # IMPORTANT: needs to be here so that text_sensor is included in the build directory
 text_sensor:
+  platform: template
+  id: approach_sensor_id
+  name: "Approach"
+
 
 sensor:
 - platform: custom
   lambda: |-
     auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
+    my_sensor->set_approach_sensor(id(approach_sensor_id));
     App.register_component(my_sensor);
     return {my_sensor->sensor1};
 
   sensors:
-  - name: "Movement sign parameter"
+  - name: "Movement sign"
     unit_of_measurement: '%'
     accuracy_decimals: 0
 

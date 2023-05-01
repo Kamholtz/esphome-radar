@@ -23,6 +23,8 @@ const uint8_t DATA_MAX_LEN = 4;
 const uint8_t PACKET_MAX_LEN = 12;
 const uint8_t CRC_LEN = 2;
 
+const uint8_t APPROACH_DATA_IDX = 2;
+
 // enums
 enum class ApproachStatus: uint8_t {
   NONE = 0x01,
@@ -40,7 +42,8 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
   public:
     R24AVD1Component(uart::UARTComponent *parent) : uart::UARTDevice(parent) {}
     sensor::Sensor *sensor1 = new sensor::Sensor();
-    text_sensor::TextSensor *approach_status = new text_sensor::TextSensor();
+    void set_approach_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
+
     void setup() override;
     void dump_config() override;
     void loop() override;
@@ -48,7 +51,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
   protected:
     int readline_(int readch, uint8_t *buffer, int len, int initial_pos); 
-
+    text_sensor::TextSensor *approach_text_sensor_{nullptr};
 };
 }  // namespace r24avd1
 }  // namespace esphome
