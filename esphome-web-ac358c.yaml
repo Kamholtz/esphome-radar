@@ -3,6 +3,7 @@ esphome:
   includes:
     - crc.h
     - r24avd1.h
+    - r24avd1.cpp
 
 esp32:
   board: esp32dev
@@ -141,17 +142,24 @@ uart:
     sequence:
       - lambda: UARTDebug::log_string(direction, bytes);
 
+# IMPORTANT: needs to be here so that text_sensor is included in the build directory
+text_sensor:
+  platform: template
+  id: approach_sensor_id
+  name: "Approach"
+
 
 sensor:
 - platform: custom
   lambda: |-
     auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
+    my_sensor->set_approach_sensor(id(approach_sensor_id));
     App.register_component(my_sensor);
     return {my_sensor->sensor1};
 
   sensors:
-  - name: "My Custom Temperature Sensor"
-    unit_of_measurement: °C
-    accuracy_decimals: 1
+  - name: "Movement sign"
+    unit_of_measurement: '%'
+    accuracy_decimals: 0
 
   # id: radar_new_id
