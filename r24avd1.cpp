@@ -8,6 +8,7 @@ static const char *const TAG = "r24avd1";
 
 void R24AVD1Component::setup() {
   // nothing to do
+  approach_status->set_name("ApproachStatus");
 }
 void R24AVD1Component::dump_config() {
   // not implemented
@@ -86,31 +87,32 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                 this->sensor1->publish_state(float_data_union.f);
               }
 
-              // if (function_code == (uint8_t)crc::FunctionCode::ACTIVELY_REPORT_COMMAND &&
-              //     address_code_1 == (uint8_t)crc::PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-              //     address_code_2 == 0x07 && 
-              //     this->approch_status->get_state() != float_data_union.data[1]) {
-              //
-              //   ESP_LOGD(TAG, "approach_status: %X", float_data_union.data[1]);
-              //
-              //   std::string state_str;
-              //   switch (float_data_union.data[1]) {
-              //     case (uint8_t)ApproachStatus::NONE:
-              //       state_str = "None";
-              //       break;
-              //     case (uint8_t)ApproachStatus::CLOSE:
-              //       state_str = "Close";
-              //       break;
-              //     case (uint8_t)ApproachStatus::FAR:
-              //       state_str = "Far";
-              //       break;
-              //     default:
-              //       state_str = "";
-              //       break;
-              //   }
-              //   
-              //   this->approch_status->publish_state(state_str);
-              // }
+              if (function_code == (uint8_t)crc::FunctionCode::ACTIVELY_REPORT_COMMAND &&
+                  address_code_1 == (uint8_t)crc::PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+                  address_code_2 == 0x07) {
+
+                ESP_LOGD(TAG, "approach_status: %X", float_data_union.data[1]);
+
+                std::string state_str;
+                switch (float_data_union.data[1]) {
+                  case (uint8_t)ApproachStatus::NONE:
+                    state_str = "None";
+                    break;
+                  case (uint8_t)ApproachStatus::CLOSE:
+                    state_str = "Close";
+                    break;
+                  case (uint8_t)ApproachStatus::FAR:
+                    state_str = "Far";
+                    break;
+                  default:
+                    state_str = "";
+                    break;
+                }
+                
+                if (this->approach_status->get_state() != state_str) {
+                  this->approach_status->publish_state(state_str);
+                }
+              }
 
 
             }
