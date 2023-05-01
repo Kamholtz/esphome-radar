@@ -151,8 +151,8 @@ sensor:
     return {my_sensor->sensor1};
 
   sensors:
-  - name: "My Custom Temperature Sensor"
-    unit_of_measurement: °C
-    accuracy_decimals: 1
+  - name: "Movement sign parameter"
+    unit_of_measurement: '%'
+    accuracy_decimals: 0
 
   # id: radar_new_id

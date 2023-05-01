@@ -74,7 +74,15 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
               }
 
               ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_union.data[0], float_data_union.data[1], float_data_union.data[2], float_data_union.data[3]);
-              ESP_LOGD(TAG, "float_data_union: %f", float_data_union.f);
+
+
+              if (function_code == (uint8_t)crc::FunctionCode::ACTIVELY_REPORT_COMMAND &&
+                  address_code_1 == (uint8_t)crc::PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+                  address_code_2 == 0x06) {
+
+                ESP_LOGD(TAG, "float_data_union: %f", float_data_union.f);
+                this->sensor1->publish_state(float_data_union.f);
+              }
             }
 
           } else {
