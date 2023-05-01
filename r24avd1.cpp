@@ -78,7 +78,8 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
 
               if (function_code == (uint8_t)crc::FunctionCode::ACTIVELY_REPORT_COMMAND &&
                   address_code_1 == (uint8_t)crc::PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-                  address_code_2 == 0x06) {
+                  address_code_2 == 0x06 && 
+                  this->sensor1->get_state() != float_data_union.f) {
 
                 ESP_LOGD(TAG, "float_data_union: %f", float_data_union.f);
                 this->sensor1->publish_state(float_data_union.f);
