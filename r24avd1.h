@@ -41,7 +41,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
   public:
     R24AVD1Component(uart::UARTComponent *parent) : uart::UARTDevice(parent) {}
-    sensor::Sensor *sensor1 = new sensor::Sensor();
+    sensor::Sensor *motion_amplitude = new sensor::Sensor();
     void set_approach_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
 
     void setup() override;

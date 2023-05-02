@@ -155,7 +155,7 @@ sensor:
     auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
     my_sensor->set_approach_sensor(id(approach_sensor_id));
     App.register_component(my_sensor);
-    return {my_sensor->sensor1};
+    return {my_sensor->motion_amplitude};
 
   sensors:
   - name: "Movement sign"
