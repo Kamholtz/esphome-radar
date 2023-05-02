@@ -70,6 +70,10 @@ enum class AddressCode2 {
 
 };
 
+
+
+
+
 enum class UnmannedStallData0 {
     UNMANNED_NO_COERSION = 0x00,
     UNMANNED_10S = 0X01,

@@ -3,6 +3,7 @@
 #include "esphome/components/uart/uart.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/text_sensor/text_sensor.h"
+#include "esphome/components/binary_sensor/binary_sensor.h"
 #include "esphome/core/log.h"
 
 
@@ -32,6 +33,12 @@ enum class ApproachStatus: uint8_t {
   FAR = 0x03,
 };
 
+enum class EnvironmentStatus: uint32_t {
+    UNMANNED = 0x00FFFF,
+    PRESCENCE = 0x0100FF,
+    MOTION = 0x010101,
+};
+
 using float_data = union {
   uint8_t data[4];
   float f;
@@ -41,6 +48,9 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
   public:
     R24AVD1Component(uart::UARTComponent *parent) : uart::UARTDevice(parent) {}
+    sensor::Sensor *motion_binary_sensor = new sensor::Sensor();
+    void set_motion_binary_sensor(binary_sensor::BinarySensor *sens) { this->motion_binary_sensor_ = sens; };
+    void set_presence_binary_sensor(binary_sensor::BinarySensor *sens) { this->presence_binary_sensor_ = sens; };
     sensor::Sensor *motion_amplitude = new sensor::Sensor();
     void set_approach_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
 
@@ -52,6 +62,8 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
   protected:
     int readline_(int readch, uint8_t *buffer, int len, int initial_pos); 
     text_sensor::TextSensor *approach_text_sensor_{nullptr};
+    binary_sensor::BinarySensor *motion_binary_sensor_{nullptr};
+    binary_sensor::BinarySensor *presence_binary_sensor_{nullptr};
 };
 }  // namespace r24avd1
 }  // namespace esphome

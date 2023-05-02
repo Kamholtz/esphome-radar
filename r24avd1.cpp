@@ -113,6 +113,43 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                 }
               }
 
+              if (function_code == (uint8_t)crc::FunctionCode::ACTIVELY_REPORT_COMMAND &&
+                  address_code_1 == (uint8_t)crc::PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+                  address_code_2 == (uint8_t)crc::AddressCode2::ENVIRONMENT_STATUS) {
+
+                ESP_LOGD(TAG, "motion_binary: %X", float_data_union.data[0]);
+
+                bool presence = false;
+                bool motion = false;
+
+                uint32_t status = float_data_union.data[0] << 16 | float_data_union.data[1] << 8 | float_data_union.data[2] << 0;
+                switch (status) {
+                  case (uint32_t)EnvironmentStatus::UNMANNED:
+                    presence = false;
+                    motion = false;
+                    break;
+                  case (uint32_t)EnvironmentStatus::PRESCENCE:
+                    presence = true;
+                    motion = false;
+                    break;
+                  case (uint32_t)EnvironmentStatus::MOTION:
+                    presence = true;
+                    motion = true;
+                    break;
+                  default:
+                    break;
+                }
+
+                LOG_BINARY_SENSOR("  ", "Motion", this->motion_binary_sensor_);
+                if (this->motion_binary_sensor_ != nullptr && this->motion_binary_sensor_->state != motion) {
+                  this->motion_binary_sensor_->publish_state(motion);
+                }
+
+                LOG_BINARY_SENSOR("  ", "Presence", this->presence_binary_sensor_);
+                if (this->presence_binary_sensor_ != nullptr && this->presence_binary_sensor_->state != presence) {
+                  this->presence_binary_sensor_->publish_state(presence);
+                }
+              }
 
             }
 

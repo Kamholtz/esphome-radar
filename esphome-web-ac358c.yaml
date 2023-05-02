@@ -29,8 +29,8 @@ wifi:
     password: "XtB9tpm6aSBQ"
 
 captive_portal:
-    
-    
+
+
 binary_sensor:
   - platform: gpio
     pin:
@@ -48,6 +48,16 @@ binary_sensor:
       mode:
         input: true
     name: "Movement"
+    device_class: motion
+  - platform: template
+    name: "Presence UART"
+    id: presence_uart
+    device_class: presence
+    filters:
+      - delayed_on_off: 10ms
+  - platform: template
+    name: "Movement UART"
+    id: motion_uart
     device_class: motion
 
 select:
@@ -154,6 +164,8 @@ sensor:
   lambda: |-
     auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
     my_sensor->set_approach_sensor(id(approach_sensor_id));
+    my_sensor->set_motion_binary_sensor(id(motion_uart));
+    my_sensor->set_presence_binary_sensor(id(presence_uart));
     App.register_component(my_sensor);
     return {my_sensor->motion_amplitude};
 
