@@ -71,7 +71,8 @@ select:
      - "Bedroom (top loading) (0x03)"
      - "Bedroom (top mounted) (0x04)"
      - "Bedroom (top mounted) (0x05)"
-    initial_option: "Default (0x00)"
+    restore_value: true
+    # initial_option: "Default (0x00)"
     optimistic: true
     on_value:
       then:
@@ -94,7 +95,8 @@ select:
      - "10min - (0X06)"
      - "30min - (0X07)"
      - "60min - (0X08)"
-    initial_option: "no coersion - (0x00)"
+    # initial_option: "no coersion - (0x00)"
+    restore_value: true
     optimistic: true
 
 button:
@@ -123,6 +125,7 @@ number:
   - platform: template
     id: gear_threshold
     name: "Gear Threshold (0x04, 0x0C)"
+    restore_value: true
     optimistic: true
     min_value: 1
     max_value: 10
