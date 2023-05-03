@@ -77,8 +77,8 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
 
 
               // motion parameter
-              if (function_code == (uint8_t)crc::FunctionCode::ACTIVELY_REPORT_COMMAND &&
-                  address_code_1 == (uint8_t)crc::PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+              if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+                  address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == 0x06 && 
                   this->motion_amplitude->get_state() != float_data_union.f) {
 
@@ -86,8 +86,8 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                 this->motion_amplitude->publish_state(float_data_union.f);
               }
 
-              if (function_code == (uint8_t)crc::FunctionCode::ACTIVELY_REPORT_COMMAND &&
-                  address_code_1 == (uint8_t)crc::PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+              if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+                  address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == 0x07) {
 
                 ESP_LOGD(TAG, "approach_status: %X", float_data_union.data[APPROACH_DATA_IDX]);
@@ -113,9 +113,9 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                 }
               }
 
-              if (function_code == (uint8_t)crc::FunctionCode::ACTIVELY_REPORT_COMMAND &&
-                  address_code_1 == (uint8_t)crc::PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-                  address_code_2 == (uint8_t)crc::AddressCode2::ENVIRONMENT_STATUS) {
+              if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+                  address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+                  address_code_2 == (uint8_t)AddressCode2::ENVIRONMENT_STATUS) {
 
                 ESP_LOGD(TAG, "motion_binary: %X", float_data_union.data[0]);
 
