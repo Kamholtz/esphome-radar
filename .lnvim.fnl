@@ -16,7 +16,17 @@
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
                                          :args ["run" "--device" "esphome-web-ac358c.local"  "esphome-web-ac358c.yaml"]
-                                         :name "esphome run radar"
+                                         :name "esphome run radar OFFICE"
+                                         :env {}
+                                         :cwd (vim.fn.expand "%:h")
+                                         ; :strategy {1 :jobstart :use_terminal false}
+                                         })})
+
+(overseer.register_template {:name "esphome compile --only-generate radar OFFICE"
+                             :builder (fn [params] 
+                                        {:cmd ["esphome"]
+                                         :args ["compile" "--only-generate" "esphome-web-ac358c.yaml"]
+                                         :name "esphome compile --only-generate radar OFFICE"
                                          :env {}
                                          :cwd (vim.fn.expand "%:h")
                                          ; :strategy {1 :jobstart :use_terminal false}
@@ -25,8 +35,8 @@
 (overseer.register_template {:name "esphome compile radar OFFICE"
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
-                                         :args ["compile" "--only-generate" "esphome-web-ac358c.yaml"]
-                                         :name "esphome compile radar"
+                                         :args ["compile" "esphome-web-ac358c.yaml"]
+                                         :name "esphome compile radar OFFICE"
                                          :env {}
                                          :cwd (vim.fn.expand "%:h")
                                          ; :strategy {1 :jobstart :use_terminal false}
@@ -36,7 +46,7 @@
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
                                          :args ["clean" "esphome-web-ac358c.yaml"]
-                                         :name "esphome clean radar"
+                                         :name "esphome clean radar OFFICE"
                                          :env {}
                                          :cwd (vim.fn.expand "%:h")
                                          ; :strategy {1 :jobstart :use_terminal false}
@@ -46,7 +56,7 @@
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
                                          :args ["logs" "esphome-web-ac358c.yaml" "--client-id" "esphome-web-ac358c.local"]
-                                         :name "esphome clean radar"
+                                         :name "esphome clean radar OFFICE"
                                          :env {}
                                          :cwd (vim.fn.expand "%:h")
                                          ; :strategy {1 :jobstart :use_terminal false}
@@ -58,7 +68,7 @@
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
                                          :args ["run" "--device" "esphome-web-998ec8.local"  "esphome-web-998ec8.yaml"]
-                                         :name "esphome run radar"
+                                         :name "esphome run radar LOUNGE"
                                          :env {}
                                          :cwd (vim.fn.expand "%:h")
                                          ; :strategy {1 :jobstart :use_terminal false}
@@ -68,7 +78,7 @@
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
                                          :args ["compile" "--only-generate" "esphome-web-998ec8.yaml"]
-                                         :name "esphome compile radar"
+                                         :name "esphome compile radar LOUNGE"
                                          :env {}
                                          :cwd (vim.fn.expand "%:h")
                                          ; :strategy {1 :jobstart :use_terminal false}
@@ -88,7 +98,7 @@
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
                                          :args ["logs" "esphome-web-998ec8.yaml" "--client-id" "esphome-web-998ec8.local"]
-                                         :name "esphome clean radar"
+                                         :name "esphome clean radar LOUNGE"
                                          :env {}
                                          :cwd (vim.fn.expand "%:h")
                                          ; :strategy {1 :jobstart :use_terminal false}
