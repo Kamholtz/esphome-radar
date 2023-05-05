@@ -64,42 +64,45 @@
 
 
 
-(overseer.register_template {:name "esphome run radar LOUNGE"
-                             :builder (fn [params] 
-                                        {:cmd ["esphome"]
-                                         :args ["run" "--device" "esphome-web-998ec8.local"  "esphome-web-998ec8.yaml"]
-                                         :name "esphome run radar LOUNGE"
-                                         :env {}
-                                         :cwd (vim.fn.expand "%:h")
-                                         ; :strategy {1 :jobstart :use_terminal false}
-                                         })})
+(comment
 
-(overseer.register_template {:name "esphome compile radar LOUNGE"
-                             :builder (fn [params] 
-                                        {:cmd ["esphome"]
-                                         :args ["compile" "--only-generate" "esphome-web-998ec8.yaml"]
-                                         :name "esphome compile radar LOUNGE"
-                                         :env {}
-                                         :cwd (vim.fn.expand "%:h")
-                                         ; :strategy {1 :jobstart :use_terminal false}
-                                         })})
+ (overseer.register_template {:name "esphome run radar LOUNGE"
+                              :builder (fn [params] 
+                                         {:cmd ["esphome"]
+                                          :args ["run" "--device" "esphome-web-998ec8.local"  "esphome-web-998ec8.yaml"]
+                                          :name "esphome run radar LOUNGE"
+                                          :env {}
+                                          :cwd (vim.fn.expand "%:h")
+                                          ; :strategy {1 :jobstart :use_terminal false}
+                                          })})
 
-(overseer.register_template {:name "esphome clean radar LOUNGE"
-                             :builder (fn [params] 
-                                        {:cmd ["esphome"]
-                                         :args ["clean" "esphome-web-998ec8.yaml"]
-                                         :name "esphome clean radar"
-                                         :env {}
-                                         :cwd (vim.fn.expand "%:h")
-                                         ; :strategy {1 :jobstart :use_terminal false}
-                                         })})
+ (overseer.register_template {:name "esphome compile radar LOUNGE"
+                              :builder (fn [params] 
+                                         {:cmd ["esphome"]
+                                          :args ["compile" "--only-generate" "esphome-web-998ec8.yaml"]
+                                          :name "esphome compile radar LOUNGE"
+                                          :env {}
+                                          :cwd (vim.fn.expand "%:h")
+                                          ; :strategy {1 :jobstart :use_terminal false}
+                                          })})
 
-(overseer.register_template {:name "esphome log radar LOUNGE"
-                             :builder (fn [params] 
-                                        {:cmd ["esphome"]
-                                         :args ["logs" "esphome-web-998ec8.yaml" "--client-id" "esphome-web-998ec8.local"]
-                                         :name "esphome clean radar LOUNGE"
-                                         :env {}
-                                         :cwd (vim.fn.expand "%:h")
-                                         ; :strategy {1 :jobstart :use_terminal false}
-                                         })})
+ (overseer.register_template {:name "esphome clean radar LOUNGE"
+                              :builder (fn [params] 
+                                         {:cmd ["esphome"]
+                                          :args ["clean" "esphome-web-998ec8.yaml"]
+                                          :name "esphome clean radar"
+                                          :env {}
+                                          :cwd (vim.fn.expand "%:h")
+                                          ; :strategy {1 :jobstart :use_terminal false}
+                                          })})
+
+ (overseer.register_template {:name "esphome log radar LOUNGE"
+                              :builder (fn [params] 
+                                         {:cmd ["esphome"]
+                                          :args ["logs" "esphome-web-998ec8.yaml" "--client-id" "esphome-web-998ec8.local"]
+                                          :name "esphome clean radar LOUNGE"
+                                          :env {}
+                                          :cwd (vim.fn.expand "%:h")
+                                          ; :strategy {1 :jobstart :use_terminal false}
+                                          })})
+ )
