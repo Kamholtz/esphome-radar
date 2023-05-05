@@ -8,13 +8,13 @@ static const char *const TAG = "r24avd1";
 
 void R24AVD1Component::setup() {
   // nothing to do
-}
-void R24AVD1Component::dump_config() {
-  // not implemented
 
   unsigned char command_data[1] = {0};
   uart::UARTDevice * this_uart = (uart::UARTDevice*)this;
   write_to_uart((unsigned char)FunctionCode::WRITE_COMMAND, (unsigned char)WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)AddressCode2::THRESHOLD_GEAR, command_data, 1, *this_uart);
+}
+void R24AVD1Component::dump_config() {
+  // not implemented
 }
 void R24AVD1Component::loop() {
   const int max_line_length = 80;
