@@ -11,16 +11,71 @@ void R24AVD1Component::setup() {
 }
 void R24AVD1Component::dump_config() {
   // not implemented
+
+  unsigned char command_data[1] = {0};
+  uart::UARTDevice * this_uart = (uart::UARTDevice*)this;
+  write_to_uart((unsigned char)FunctionCode::WRITE_COMMAND, (unsigned char)WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)AddressCode2::THRESHOLD_GEAR, command_data, 1, *this_uart);
 }
 void R24AVD1Component::loop() {
   const int max_line_length = 80;
   static uint8_t buffer[max_line_length];
 
   int pos = 0;
+
   while (available()) {
     pos = this->readline_(read(), buffer, max_line_length, pos);
   }
 }
+
+uint16_t get_packet(uint8_t function_code, uint8_t address_code_1, uint8_t address_code_2, const uint8_t *data, uint16_t data_len, unsigned char *buf_out, uint16_t buf_max_len) {
+
+    uint16_t total_length = (8 + data_len);
+    if (total_length > buf_max_len) {
+        // error
+        return -1;
+    }
+    uint16_t buf_out_ii = 0;
+    buf_out[buf_out_ii] = 0x55; buf_out_ii++;
+    buf_out[buf_out_ii] = (total_length - 1) & 0xFF; buf_out_ii++; // low
+    buf_out[buf_out_ii] = ((total_length - 1) >> 8) & 0xFF; buf_out_ii++; // high
+    buf_out[buf_out_ii] = function_code; buf_out_ii++;
+    buf_out[buf_out_ii] = address_code_1; buf_out_ii++;
+    buf_out[buf_out_ii] = address_code_2; buf_out_ii++;
+
+    uint16_t buf_out_jj = 0;
+    for (buf_out_jj = 0; buf_out_jj < data_len; buf_out_jj++) {
+        buf_out[buf_out_ii] = data[buf_out_jj];
+        buf_out_ii++;
+    }
+
+    uint16_t crc = crc::us_calculate_crc16(buf_out, buf_out_ii);
+    buf_out[buf_out_ii] = (crc >> 8) & 0xFF; buf_out_ii++;
+    buf_out[buf_out_ii] = (crc) & 0xFF; buf_out_ii++;
+
+    return buf_out_ii; // final packet len
+}
+
+uint16_t write_to_uart(unsigned char function_code,
+                                     unsigned char address_code_1,
+                                     unsigned char address_code_2,
+                                     unsigned char *data,
+                                     uint16_t data_len,
+                                     uart::UARTDevice uart) 
+{
+
+    unsigned char packet[MAX_PACKET_LEN] = {0};
+    uint16_t packet_len = get_packet(function_code, address_code_1, address_code_2, data, data_len, packet, MAX_PACKET_LEN);
+
+    uint16_t log_ii = 0;
+    ESP_LOGD("crc", "packet_len: %d", packet_len);
+    for (log_ii = 0; log_ii < packet_len; log_ii++) {
+      ESP_LOGD("packet", "log_ii: %d, %X", log_ii, packet[log_ii]);
+    }
+
+    uart.write_array(packet, packet_len);
+    return packet_len;
+}
+
 
 int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initial_pos) {
   int pos = initial_pos;

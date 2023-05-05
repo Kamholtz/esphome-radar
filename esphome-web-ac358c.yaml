@@ -80,7 +80,7 @@ select:
             ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
             unsigned char b[1] = {0};
             b[0] = i;
-            crc::write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
+            r24avd1::write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
 
   - platform: template
     name: "Unmanned stall option"
@@ -112,13 +112,11 @@ button:
       then:
         - lambda: |-
             ESP_LOGD("packet", "force_into_unmanned_stall: ");
-            // this actuall reads whether there is an unmanned stall
-            // crc::write_to_uart(read_command, system_parameter, force_into_unmanned_stall, NULL, 0, id(radar_id));
             unsigned char b[1] = {0};
             auto index = id(select_unmanned_stall).active_index();
             if (index) {
               b[0] = *index;
-              crc::write_to_uart((unsigned char)crc::FunctionCode::WRITE_COMMAND, (unsigned char)crc::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)crc::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
+              r24avd1::write_to_uart((unsigned char)r24avd1::FunctionCode::WRITE_COMMAND, (unsigned char)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)r24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
             }
 
 number:
@@ -135,7 +133,7 @@ number:
         - lambda: |-
             unsigned char b[1] = {0};
             b[0] = id(gear_threshold).state;
-            crc::write_to_uart((unsigned char)crc::FunctionCode::WRITE_COMMAND, (unsigned char)crc::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)crc::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
+            r24avd1::write_to_uart((unsigned char)r24avd1::FunctionCode::WRITE_COMMAND, (unsigned char)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)r24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
 
 
 
@@ -170,6 +168,7 @@ sensor:
     my_sensor->set_motion_binary_sensor(id(motion_uart));
     my_sensor->set_presence_binary_sensor(id(presence_uart));
     App.register_component(my_sensor);
+    // consider sending uart message to get scene/gear threshold on startup
     return {my_sensor->motion_amplitude};
 
   sensors:

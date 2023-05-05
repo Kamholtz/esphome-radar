@@ -1,11 +1,9 @@
 #include "esphome/core/component.h"
-#include "esphome/components/uart/uart.h"
 #include "esphome/core/log.h"
 
 namespace esphome {
 namespace crc {
 
-#define MAX_PACKET_LEN 50
 
 const unsigned char CUC_CRC_HI[256] = {
     0x00, 0xC1, 0x81, 0x40, 0x01, 0xC0, 0x80, 0x41, 0x01, 0xC0, 0x80, 0x41,
@@ -67,64 +65,6 @@ static uint16_t us_calculate_crc16(unsigned char *lpuc_frame,
     luc_crc_hi = CUC_CRC_LO[li_index];
   }
   return (uint16_t)(luc_crc_lo << 8 | luc_crc_hi);
-}
-
-
-
-
-static uint16_t get_packet(uint8_t function_code,
-                                     uint8_t address_code_1,
-                                     uint8_t address_code_2,
-                                     const uint8_t *data,
-                                     uint16_t data_len,
-                                     unsigned char *buf_out,
-                                     uint16_t buf_max_len) {
-
-    uint16_t total_length = (8 + data_len);
-    if (total_length > buf_max_len) {
-        // error
-        return -1;
-    }
-    uint16_t buf_out_ii = 0;
-    buf_out[buf_out_ii] = 0x55; buf_out_ii++;
-    buf_out[buf_out_ii] = (total_length - 1) & 0xFF; buf_out_ii++; // low
-    buf_out[buf_out_ii] = ((total_length - 1) >> 8) & 0xFF; buf_out_ii++; // high
-    buf_out[buf_out_ii] = function_code; buf_out_ii++;
-    buf_out[buf_out_ii] = address_code_1; buf_out_ii++;
-    buf_out[buf_out_ii] = address_code_2; buf_out_ii++;
-
-    uint16_t buf_out_jj = 0;
-    for (buf_out_jj = 0; buf_out_jj < data_len; buf_out_jj++) {
-        buf_out[buf_out_ii] = data[buf_out_jj];
-        buf_out_ii++;
-    }
-
-    uint16_t crc = us_calculate_crc16(buf_out, buf_out_ii);
-    buf_out[buf_out_ii] = (crc >> 8) & 0xFF; buf_out_ii++;
-    buf_out[buf_out_ii] = (crc) & 0xFF; buf_out_ii++;
-
-    return buf_out_ii; // final packet len
-}
-
-static uint16_t write_to_uart(unsigned char function_code,
-                                     unsigned char address_code_1,
-                                     unsigned char address_code_2,
-                                     unsigned char *data,
-                                     uint16_t data_len,
-                                     esphome::uart::UARTDevice uart_device) {
-
-    unsigned char packet[MAX_PACKET_LEN] = {0};
-    uint16_t packet_len = get_packet(function_code, address_code_1, address_code_2, data, data_len, packet, MAX_PACKET_LEN);
-
-    uint16_t log_ii = 0;
-    ESP_LOGD("crc", "packet_len: %d", packet_len);
-    for (log_ii = 0; log_ii < packet_len; log_ii++) {
-      ESP_LOGD("packet", "log_ii: %d, %X", log_ii, packet[log_ii]);
-    }
-
-    uart_device.write_array(packet, packet_len);
-
-    return packet_len;
 }
 
 }  // namespace crc

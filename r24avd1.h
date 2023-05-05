@@ -123,6 +123,11 @@ using float_data = union {
   float f;
 };
 
+#define MAX_PACKET_LEN 50
+
+uint16_t get_packet(uint8_t function_code, uint8_t address_code_1, uint8_t address_code_2, const uint8_t *data, uint16_t data_len, unsigned char *buf_out, uint16_t buf_max_len);
+uint16_t write_to_uart(unsigned char function_code, unsigned char address_code_1, unsigned char address_code_2, unsigned char *data, uint16_t data_len, uart::UARTDevice uart);
+
 class R24AVD1Component : public Component, public uart::UARTDevice {
 
   public:
@@ -143,6 +148,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     text_sensor::TextSensor *approach_text_sensor_{nullptr};
     binary_sensor::BinarySensor *motion_binary_sensor_{nullptr};
     binary_sensor::BinarySensor *presence_binary_sensor_{nullptr};
+    
 };
 }  // namespace r24avd1
 }  // namespace esphome
