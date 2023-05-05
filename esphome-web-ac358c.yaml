@@ -78,7 +78,7 @@ select:
       then:
         - lambda: |-
             ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
-            unsigned char b[1] = {0};
+            uint8_t b[1] = {0};
             b[0] = i;
             r24avd1::write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
 
@@ -112,11 +112,11 @@ button:
       then:
         - lambda: |-
             ESP_LOGD("packet", "force_into_unmanned_stall: ");
-            unsigned char b[1] = {0};
+            uint8_t b[1] = {0};
             auto index = id(select_unmanned_stall).active_index();
             if (index) {
               b[0] = *index;
-              r24avd1::write_to_uart((unsigned char)r24avd1::FunctionCode::WRITE_COMMAND, (unsigned char)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)r24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
+              r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
             }
 
 number:
@@ -131,9 +131,9 @@ number:
     on_value:
       then:
         - lambda: |-
-            unsigned char b[1] = {0};
+            uint8_t b[1] = {0};
             b[0] = id(gear_threshold).state;
-            r24avd1::write_to_uart((unsigned char)r24avd1::FunctionCode::WRITE_COMMAND, (unsigned char)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)r24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
+            r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
 
 
 
