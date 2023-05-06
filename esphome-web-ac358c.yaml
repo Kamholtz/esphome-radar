@@ -5,6 +5,13 @@ esphome:
     - r24avd1.h
     - r24avd1.cpp
 
+
+external_components: 
+  - source:
+      type: local
+      path: C:/Users/carlk/repos/esphome/esphome/components/
+    components: [r24avd1]
+
 esp32:
   board: esp32dev
   framework:
@@ -161,19 +168,9 @@ text_sensor:
 
 
 sensor:
-- platform: custom
-  lambda: |-
-    auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
-    my_sensor->set_approach_sensor(id(approach_sensor_id));
-    my_sensor->set_motion_binary_sensor(id(motion_uart));
-    my_sensor->set_presence_binary_sensor(id(presence_uart));
-    App.register_component(my_sensor);
-    // consider sending uart message to get scene/gear threshold on startup
-    return {my_sensor->motion_amplitude};
+- platform: r24avd1
+  has_presence: 
+    name: PresenceGenerated
+  has_motion: 
+    name: MotionGenerated
 
-  sensors:
-  - name: "Movement sign"
-    unit_of_measurement: '%'
-    accuracy_decimals: 0
-
-  # id: radar_new_id
