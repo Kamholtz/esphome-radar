@@ -87,6 +87,15 @@ async def to_code(config):
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
 
+    # sens = await text_sensor.new_text_sensor(config)
+    # cg.add(var.set_approach_sensor(sens))
+
+    if CONF_HAS_PRESENCE in config:
+        sens = await binary_sensor.new_binary_sensor(config[CONF_HAS_PRESENCE])
+        cg.add(var.set_presence_binary_sensor(sens))
+    if CONF_HAS_MOTION in config:
+        sens = await binary_sensor.new_binary_sensor(config[CONF_HAS_MOTION])
+        cg.add(var.set_motion_binary_sensor(sens))
 
 
 
