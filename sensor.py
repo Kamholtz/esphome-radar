@@ -11,9 +11,9 @@ from esphome.const import (
 from esphome import automation
 from esphome.automation import maybe_simple_id
 
-DEPENDENCIES = ["uart", "binary_sensor"]
+DEPENDENCIES = ["uart"]
 CODEOWNERS = ["@kamholtz"]
-MULTI_CONF = True
+# MULTI_CONF = True
 
 r24avd1_ns = cg.esphome_ns.namespace("r24avd1")
 R24AVD1Component = r24avd1_ns.class_("R24AVD1Component", cg.Component, uart.UARTDevice)
@@ -28,7 +28,7 @@ CONF_R24AVD1_ID = "r24avd1_id"
 CONF_HAS_PRESENCE = "has_presence"
 CONF_HAS_MOTION = "has_motion"
 
-CONFIG_SCHEMA = cv.All(
+CONFIG_SCHEMA = (
     cv.Schema(
         {
             cv.GenerateID(): cv.declare_id(R24AVD1Component),
@@ -44,6 +44,31 @@ CONFIG_SCHEMA = cv.All(
     .extend(uart.UART_DEVICE_SCHEMA)
     .extend(cv.COMPONENT_SCHEMA)
 )
+
+# CONFIG_SCHEMA = (
+#     cv.Schema(
+#         {
+#             cv.GenerateID(): cv.declare_id(MHZ19Component),
+#             cv.Required(CONF_CO2): sensor.sensor_schema(
+#                 unit_of_measurement=UNIT_PARTS_PER_MILLION,
+#                 icon=ICON_MOLECULE_CO2,
+#                 accuracy_decimals=0,
+#                 device_class=DEVICE_CLASS_CARBON_DIOXIDE,
+#                 state_class=STATE_CLASS_MEASUREMENT,
+#             ),
+#             cv.Optional(CONF_TEMPERATURE): sensor.sensor_schema(
+#                 unit_of_measurement=UNIT_CELSIUS,
+#                 accuracy_decimals=0,
+#                 device_class=DEVICE_CLASS_TEMPERATURE,
+#                 state_class=STATE_CLASS_MEASUREMENT,
+#             ),
+#             cv.Optional(CONF_AUTOMATIC_BASELINE_CALIBRATION): cv.boolean,
+#         }
+#     )
+#     .extend(cv.polling_component_schema("60s"))
+#     .extend(uart.UART_DEVICE_SCHEMA)
+# )
+
 
 # DONE
 FINAL_VALIDATE_SCHEMA = uart.final_validate_device_schema(
@@ -61,23 +86,15 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID]) # TODO: what is this
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
-    sens = await text_sensor.new_text_sensor(config)
-    cg.add(r24avd1_component.set_approach_sensor(sens))
-
-    if CONF_HAS_PRESENCE in config:
-        sens = await binary_sensor.new_binary_sensor(config[CONF_HAS_PRESENCE])
-        cg.add(r24avd1_component.set_presence_binary_sensor(sens))
-    if CONF_HAS_MOTION in config:
-        sens = await binary_sensor.new_binary_sensor(config[CONF_HAS_MOTION])
-        cg.add(r24avd1_component.set_motion_binary_sensor(sens))
 
 
 
-# CALIBRATION_ACTION_SCHEMA = maybe_simple_id(
-#     {
-#         cv.Required(CONF_ID): cv.use_id(R24AVD1Component),
-#     }
-# )
+
+CALIBRATION_ACTION_SCHEMA = maybe_simple_id(
+    {
+        cv.Required(CONF_ID): cv.use_id(R24AVD1Component),
+    }
+)
 
 
 
