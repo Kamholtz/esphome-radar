@@ -131,7 +131,6 @@ uint16_t write_to_uart(unsigned char function_code, unsigned char address_code_1
 class R24AVD1Component : public Component, public uart::UARTDevice {
 
   public:
-    R24AVD1Component(uart::UARTComponent *parent) : uart::UARTDevice(parent) {}
     sensor::Sensor *motion_binary_sensor = new sensor::Sensor();
     void set_motion_binary_sensor(binary_sensor::BinarySensor *sens) { this->motion_binary_sensor_ = sens; };
     void set_presence_binary_sensor(binary_sensor::BinarySensor *sens) { this->presence_binary_sensor_ = sens; };
