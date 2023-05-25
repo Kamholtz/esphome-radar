@@ -42,6 +42,17 @@
                                          ; :strategy {1 :jobstart :use_terminal false}
                                          })})
 
+
+(overseer.register_template {:name "esphome run radar test OFFICE"
+                             :builder (fn [params] 
+                                        {:cmd ["esphome"]
+                                         :args ["run" "--device" "esphome-web-ac358c.local"  "esphome-test.yaml"]
+                                         :name "esphome run radar test OFFICE"
+                                         :env {}
+                                         :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
+                                         ; :strategy {1 :jobstart :use_terminal false}
+                                         })})
+
 (overseer.register_template {:name "esphome compile radar test OFFICE"
                              :builder (fn [params] 
                                         {:cmd ["esphome"]

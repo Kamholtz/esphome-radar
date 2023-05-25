@@ -27,6 +27,7 @@ CONF_R24AVD1_ID = "r24avd1_id"
 
 CONF_HAS_PRESENCE = "has_presence"
 CONF_HAS_MOTION = "has_motion"
+CONF_HAS_APPROACH = "has_approach"
 
 CONFIG_SCHEMA = (
     cv.Schema(
@@ -39,6 +40,9 @@ CONFIG_SCHEMA = (
             ),
             cv.Optional(CONF_HAS_MOTION): binary_sensor.binary_sensor_schema(
                 device_class=DEVICE_CLASS_MOTION
+            ),
+            cv.Optional(CONF_HAS_APPROACH): text_sensor.text_sensor_schema(
+                # icon=ICON_ACCURACY # TODO: find icon to use here
             ),
         }
     )
@@ -97,6 +101,9 @@ async def to_code(config):
     if CONF_HAS_MOTION in config:
         sens = await binary_sensor.new_binary_sensor(config[CONF_HAS_MOTION])
         cg.add(var.set_motion_binary_sensor(sens))
+    if CONF_HAS_APPROACH in config:
+        sens = await text_sensor.new_text_sensor(config[CONF_HAS_APPROACH])
+        cg.add(var.set_approach_text_sensor(sens))
 
 
 

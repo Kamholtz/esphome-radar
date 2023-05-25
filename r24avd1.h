@@ -135,7 +135,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     void set_motion_binary_sensor(binary_sensor::BinarySensor *sens) { this->motion_binary_sensor_ = sens; };
     void set_presence_binary_sensor(binary_sensor::BinarySensor *sens) { this->presence_binary_sensor_ = sens; };
     sensor::Sensor *motion_amplitude = new sensor::Sensor();
-    void set_approach_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
+    void set_approach_text_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
 
     void setup() override;
     void dump_config() override;
