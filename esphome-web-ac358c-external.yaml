@@ -1,0 +1,76 @@
+esphome:
+  name: esphome-web-ac358c
+  # includes:
+  #   - crc.h
+  #   - r24avd1.h
+  #   - r24avd1.cpp
+
+
+external_components: 
+  - source:
+      type: local
+      path: C:/Users/carlk/repos/esphome/esphome/components/
+    components: [r24avd1]
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-Ac358C"
+    password: "XtB9tpm6aSBQ"
+
+captive_portal:
+
+
+
+binary_sensor:
+  - platform: template
+    name: "Presence UART"
+    id: presence_uart
+    device_class: presence
+    filters:
+      - delayed_on_off: 10ms
+  # - platform: template
+  #   name: "Movement UART"
+  #   id: motion_uart
+  #   device_class: motion
+
+
+text_sensor:
+
+uart:
+  id: radar_id
+  tx_pin: 14
+  rx_pin: 27
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+
+sensor:
+  - platform: r24avd1
+    has_presence: 
+      name: PresenceGenerated
+    has_motion: 
+      name: MotionGenerated
+    has_approach: 
+      name: ApproachGenerated
+
+
+# NOTE: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome
