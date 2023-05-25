@@ -11,7 +11,7 @@ from esphome.const import (
 from esphome import automation
 from esphome.automation import maybe_simple_id
 
-DEPENDENCIES = ["uart"]
+DEPENDENCIES = ["uart", "text_sensor", "binary_sensor"]
 CODEOWNERS = ["@kamholtz"]
 # MULTI_CONF = True
 
@@ -34,6 +34,7 @@ CONFIG_SCHEMA = (
             cv.GenerateID(): cv.declare_id(R24AVD1Component),
 
             cv.Optional(CONF_HAS_PRESENCE): binary_sensor.binary_sensor_schema(
+                # TODO: Can I put name here so it always appears?
                 device_class=DEVICE_CLASS_PRESENCE
             ),
             cv.Optional(CONF_HAS_MOTION): binary_sensor.binary_sensor_schema(
@@ -87,7 +88,7 @@ async def to_code(config):
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
 
-    # sens = await text_sensor.new_text_sensor(config)
+    # sens = await text_sensor.new_text_sensor(config[CONF])
     # cg.add(var.set_approach_sensor(sens))
 
     if CONF_HAS_PRESENCE in config:
