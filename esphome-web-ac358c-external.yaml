@@ -37,20 +37,7 @@ wifi:
 
 captive_portal:
 
-
-
 binary_sensor:
-  - platform: template
-    name: "Presence UART"
-    id: presence_uart
-    device_class: presence
-    filters:
-      - delayed_on_off: 10ms
-  # - platform: template
-  #   name: "Movement UART"
-  #   id: motion_uart
-  #   device_class: motion
-
 
 text_sensor:
 
@@ -129,8 +116,6 @@ number:
             b[0] = id(gear_threshold).state;
             r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
 
-
-
 uart:
   id: radar_id
   tx_pin: 14
@@ -150,4 +135,4 @@ sensor:
       name: ApproachGenerated
 
 
-# NOTE: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome
+# IMPORTANT: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome
