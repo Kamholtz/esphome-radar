@@ -55,6 +55,81 @@ binary_sensor:
 text_sensor:
 
 select:
+  - platform: template
+    name: "Scene (0x04, 0x10)"
+    id: select_scene
+    options:
+     - "Default (0x00)"
+     - "Area detection (top mounted) (0x01)"
+     - "Toilet (top mounted) (0x02)"
+     - "Bedroom (top loading) (0x03)"
+     - "Bedroom (top mounted) (0x04)"
+     - "Bedroom (top mounted) (0x05)"
+    restore_value: true
+    # initial_option: "Default (0x00)"
+    optimistic: true
+    on_value:
+      then:
+        - lambda: |-
+            ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
+            uint8_t b[1] = {0};
+            b[0] = i;
+            r24avd1::write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
+
+  - platform: template
+    name: "Unmanned stall option"
+    id: select_unmanned_stall
+    options:
+     - "no coersion - (0x00)"
+     - "10s - (0X01)"
+     - "30s - (0X02)"
+     - "1min - (0X03)"
+     - "2min - (0X04)"
+     - "5min - (0X05)"
+     - "10min - (0X06)"
+     - "30min - (0X07)"
+     - "60min - (0X08)"
+    # initial_option: "no coersion - (0x00)"
+    restore_value: true
+    optimistic: true
+
+button:
+  - platform: template
+    name: Force unmanned stall
+    id: unmanned_stall_button
+
+    # Optional variables:
+    # find more:
+    # https://icon-sets.iconify.design/mdi/close-circle-outline/
+    icon: "mdi:close-circle-outline"
+    on_press:
+      then:
+        - lambda: |-
+            ESP_LOGD("packet", "force_into_unmanned_stall: ");
+            uint8_t b[1] = {0};
+            auto index = id(select_unmanned_stall).active_index();
+            if (index) {
+              b[0] = *index;
+              r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
+            }
+
+number:
+  - platform: template
+    id: gear_threshold
+    name: "Gear Threshold (0x04, 0x0C)"
+    restore_value: true
+    optimistic: true
+    min_value: 1
+    max_value: 10
+    step: 1
+    on_value:
+      then:
+        - lambda: |-
+            uint8_t b[1] = {0};
+            b[0] = id(gear_threshold).state;
+            r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
+
+
 
 uart:
   id: radar_id
@@ -73,8 +148,6 @@ sensor:
       name: MotionGenerated
     has_approach: 
       name: ApproachGenerated
-    has_scene: 
-      name: SceneGenerated
 
 
 # NOTE: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome
