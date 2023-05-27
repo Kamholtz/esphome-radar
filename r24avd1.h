@@ -4,6 +4,7 @@
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/text_sensor/text_sensor.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
+#include "esphome/components/select/select.h"
 #include "esphome/core/log.h"
 
 
@@ -136,6 +137,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     void set_presence_binary_sensor(binary_sensor::BinarySensor *sens) { this->presence_binary_sensor_ = sens; };
     sensor::Sensor *motion_amplitude = new sensor::Sensor();
     void set_approach_text_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
+    void set_scene_select(select::Select *sens) { this->scene_select_ = sens; };
 
     void setup() override;
     void dump_config() override;
@@ -147,6 +149,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     text_sensor::TextSensor *approach_text_sensor_{nullptr};
     binary_sensor::BinarySensor *motion_binary_sensor_{nullptr};
     binary_sensor::BinarySensor *presence_binary_sensor_{nullptr};
+    select::Select *scene_select_{nullptr};
     
 };
 }  // namespace r24avd1

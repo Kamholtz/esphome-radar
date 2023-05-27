@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import uart, binary_sensor, text_sensor # TODO: text_sensor, select, number, button
+from esphome.components import uart, binary_sensor, text_sensor, select # TODO: text_sensor, select, number, button
 from esphome.const import (
     CONF_ID,
     CONF_TIMEOUT,
@@ -11,7 +11,7 @@ from esphome.const import (
 from esphome import automation
 from esphome.automation import maybe_simple_id
 
-DEPENDENCIES = ["uart", "text_sensor", "binary_sensor"]
+DEPENDENCIES = ["uart", "text_sensor", "binary_sensor", "select"]
 CODEOWNERS = ["@kamholtz"]
 # MULTI_CONF = True
 
@@ -28,6 +28,7 @@ CONF_R24AVD1_ID = "r24avd1_id"
 CONF_HAS_PRESENCE = "has_presence"
 CONF_HAS_MOTION = "has_motion"
 CONF_HAS_APPROACH = "has_approach"
+CONF_HAS_SCENE = "has_scene"
 
 CONFIG_SCHEMA = (
     cv.Schema(
@@ -43,6 +44,9 @@ CONFIG_SCHEMA = (
             ),
             cv.Optional(CONF_HAS_APPROACH): text_sensor.text_sensor_schema(
                 # icon=ICON_ACCURACY # TODO: find icon to use here
+            ),
+            cv.Optional(CONF_HAS_SCENE): select.select_schema(
+                # device_class=DEVICE_CLASS_SCENE
             ),
         }
     )
@@ -87,6 +91,15 @@ FINAL_VALIDATE_SCHEMA = uart.final_validate_device_schema(
 )
 
 
+scene_options = [
+    "Default (0x00)",
+    "Area detection (top mounted) (0x01)",
+    "Toilet (top mounted) (0x02)",
+    "Bedroom (top loading) (0x03)",
+    "Bedroom (top mounted) (0x04)",
+    "Bedroom (top mounted) (0x05)"
+]
+
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID]) # TODO: what is this
     await cg.register_component(var, config)
@@ -104,6 +117,17 @@ async def to_code(config):
     if CONF_HAS_APPROACH in config:
         sens = await text_sensor.new_text_sensor(config[CONF_HAS_APPROACH])
         cg.add(var.set_approach_text_sensor(sens))
+    if CONF_HAS_SCENE in config:
+        # sens = await select.new_select(config[CONF_HAS_SCENE], options=scene_options)
+        sens = await select.new_select(config[CONF_HAS_SCENE], options=list(scene_options))
+        await cg.register_component(sens, config[CONF_HAS_SCENE])
+        cg.add(sens.set_select_mappings(list(scene_options)))
+        # cg.add(var.set_scene_select(sens))
+
+        # var = await select.new_select(config, options=list(options_map.values()))
+        # await cg.register_component(var, config)
+        # cg.add(var.set_select_mappings(list(options_map.keys())))
+
 
 
 
