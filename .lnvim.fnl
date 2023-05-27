@@ -46,17 +46,17 @@
 (overseer.register_template {:name "esphome run radar external OFFICE"
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
-                                         :args ["run" "--device" "esphome-web-ac358c.local"  "esphome-external.yaml"]
+                                         :args ["run" "-v" "--device" "esphome-web-ac358c.local"  "esphome-external.yaml"]
                                          :name "esphome run radar external OFFICE"
                                          :env {}
                                          :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
                                          ; :strategy {1 :jobstart :use_terminal false}
                                          })})
 
-(overseer.register_template {:name "esphome compile radar test OFFICE"
+(overseer.register_template {:name "esphome compile radar external OFFICE"
                              :builder (fn [params] 
                                         {:cmd ["esphome"]
-                                         :args ["compile" "esphome-test.yaml"]
+                                         :args ["compile" "esphome-external.yaml"]
                                          :name "esphome compile radar OFFICE"
                                          :env {}
                                          :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
@@ -70,6 +70,16 @@
                                          :name "esphome clean radar OFFICE"
                                          :env {}
                                          :cwd (vim.fn.expand "%:h")
+                                         ; :strategy {1 :jobstart :use_terminal false}
+                                         })})
+
+(overseer.register_template {:name "esphome clean external OFFICE"
+                             :builder (fn [params] 
+                                        {:cmd ["esphome"]
+                                         :args ["clean" "esphome-external.yaml"]
+                                         :name "esphome clean radar external OFFICE"
+                                         :env {}
+                                         :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
                                          ; :strategy {1 :jobstart :use_terminal false}
                                          })})
 
