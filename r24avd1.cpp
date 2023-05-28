@@ -14,7 +14,7 @@ void R24AVD1Component::setup() {
   write_to_uart((unsigned char)FunctionCode::WRITE_COMMAND, (unsigned char)WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)AddressCode2::THRESHOLD_GEAR, command_data, 1, *this_uart);
 }
 void R24AVD1Component::dump_config() {
-  // not implemented
+  // TODO: implement
 }
 void R24AVD1Component::loop() {
   const int max_line_length = 80;

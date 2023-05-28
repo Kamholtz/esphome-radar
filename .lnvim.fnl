@@ -53,6 +53,17 @@
                                          ; :strategy {1 :jobstart :use_terminal false}
                                          })})
 
+
+(overseer.register_template {:name "esphome run radar external DOWNSTAIRS"
+                             :builder (fn [params] 
+                                        {:cmd ["esphome"]
+                                         :args ["run" "--device" "esphome-web-abf2ec.local"  "esphome-external-downstairs.yaml"]
+                                         :name "esphome run radar external DOWNSTAIRS"
+                                         :env {}
+                                         :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
+                                         ; :strategy {1 :jobstart :use_terminal false}
+                                         })})
+
 (overseer.register_template {:name "esphome compile radar external OFFICE"
                              :builder (fn [params] 
                                         {:cmd ["esphome"]

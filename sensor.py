@@ -7,7 +7,7 @@ from esphome.const import (
     DEVICE_CLASS_MOTION
 )
 
-DEPENDENCIES = ["uart", "text_sensor", "binary_sensor"]
+DEPENDENCIES = ["text_sensor", "binary_sensor"]
 CODEOWNERS = ["@kamholtz"]
 
 r24avd1_ns = cg.esphome_ns.namespace("r24avd1")
