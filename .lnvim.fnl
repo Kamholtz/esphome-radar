@@ -92,10 +92,21 @@
   {:name "esphome run radar external BALCONY"
    :builder (fn [params] 
               {:cmd ["esphome"]
-               :args ["run" "--device" "esphome-web-abf2ec.local"  "esphome-external-balcony.yaml"]
+               :args ["run" "--device" "esphome-web-radar-1.local"  "esphome-external-balcony.yaml"]
                :name "esphome run radar external BALCONY"
                :env {}
                :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
+
+(overseer.register_template 
+    {:name "esphome log radar BALCONY"
+     :builder (fn [params] 
+                {:cmd ["esphome"]
+                 :args ["logs" "esphome-external-balcony.yaml" "--client-id" "esphome-web-radar-1.local"]
+                 :name "esphome clean radar BALCONY"
+                 :env {}
+                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
+                 ; :strategy {1 :jobstart :use_terminal false}
+                 })})
 
 
 ;; -- external, balcony (abf408)
@@ -106,7 +117,7 @@
                :args ["run" "--device" "esphome-web-abf408.local"  "esphome-external-downstairs.yaml"]
                :name "esphome run radar external DOWNSTAIRS"
                :env {}
-               :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
+               :cwd (vim.fn.expand "%:h")})})
 
 
 (comment
