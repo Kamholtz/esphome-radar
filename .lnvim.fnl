@@ -87,12 +87,23 @@
                :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
 
 
-;; --- external, downstairs (abf2ec)
+;; --- external, balcony (abf2ec)
+(overseer.register_template 
+  {:name "esphome run radar external BALCONY"
+   :builder (fn [params] 
+              {:cmd ["esphome"]
+               :args ["run" "--device" "esphome-web-abf2ec.local"  "esphome-external-balcony.yaml"]
+               :name "esphome run radar external BALCONY"
+               :env {}
+               :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
+
+
+;; -- external, balcony (abf408)
 (overseer.register_template 
   {:name "esphome run radar external DOWNSTAIRS"
    :builder (fn [params] 
               {:cmd ["esphome"]
-               :args ["run" "--device" "esphome-web-abf2ec.local"  "esphome-external-downstairs.yaml"]
+               :args ["run" "--device" "esphome-web-abf408.local"  "esphome-external-downstairs.yaml"]
                :name "esphome run radar external DOWNSTAIRS"
                :env {}
                :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
