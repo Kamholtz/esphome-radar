@@ -1,5 +1,5 @@
 esphome:
-  name: esphome-web-abf2ec
+  name: esphome-web-radar-1
 
 
 esp32:
@@ -40,7 +40,7 @@ uart:
 ld2410:
   timeout: 5s
   max_move_distance : 6m
-  max_still_distance: 0.75m
+  max_still_distance: 4.5m
   g0_move_threshold: 10
   g0_still_threshold: 20
   g1_move_threshold: 10
