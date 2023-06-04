@@ -29,6 +29,7 @@ wifi:
 captive_portal:
 
 
+
 uart:
   - id: uart_1_id
     tx_pin: 14
@@ -117,3 +118,21 @@ sensor:
       name: Still Energy 2
     detection_distance:
       name: Detection Distance 2
+
+binary_sensor:
+  - platform: ld2410
+    ld2410_id: ld2410_1_id
+    has_target:
+      name: Presence 1
+    has_moving_target:
+      name: Moving Target 1
+    has_still_target:
+      name: Still Target 1
+  - platform: ld2410
+    ld2410_id: ld2410_2_id
+    has_target:
+      name: Presence 2
+    has_moving_target:
+      name: Moving Target 2
+    has_still_target:
+      name: Still Target 2
