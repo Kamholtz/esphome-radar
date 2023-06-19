@@ -25,7 +25,6 @@ api:
 
 ota:
 
-
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
@@ -130,11 +129,11 @@ text_sensor:
 sensor:
   - platform: r24avd1
     has_presence: 
-      name: PresenceGenerated
+      name: Presence
     has_motion: 
-      name: MotionGenerated
+      name: Motion
     has_approach: 
-      name: ApproachGenerated
+      name: Approach
 
 
 # IMPORTANT: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome
