@@ -115,7 +115,7 @@
    :builder (fn [params] 
               (let [this-dir (vim.fn.expand "%:h")] 
                 {:cmd ["esphome"]
-                 :args ["run" "--device" "esphome-web-abf408.local"   "../r24avd1/esphome-web-abf408-external.yaml"]
+                 :args ["run" "--device" "esphome-abf408-entrance-1.local" "../r24avd1/esphome-abf408-entrance-1.yaml"]
                  :name "esphome run radar external DOWNSTAIRS"
                  :env {}
                  :cwd (.. this-dir "/../r24avd1-test")}))})
