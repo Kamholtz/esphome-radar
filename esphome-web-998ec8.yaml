@@ -1,15 +1,15 @@
 esphome:
   name: esphome-web-998ec8
-  includes:
-    - veml7700_sensor.h
-    - crc.h
-    - r24avd1.h
-    - r24avd1.cpp
   libraries:
     - SPI
     - Wire
     - adafruit/Adafruit BusIO @ 1.9.6
-    - "https://github.com/adafruit/Adafruit_VEML7700"
+
+external_components: 
+  - source:
+      type: local
+      path: C:/Users/carlk/repos/esphome/esphome/components/
+    components: [r24avd1]
 
 esp32:
   board: esp32dev
@@ -46,34 +46,29 @@ i2c:
   
     
 sensor:
-  - platform: custom
-    lambda: |-
-      auto my_sensor = new r24avd1::R24AVD1Component(id(radar_id));
-      my_sensor->set_approach_sensor(id(approach_sensor_id));
-      my_sensor->set_motion_binary_sensor(id(motion_uart));
-      my_sensor->set_presence_binary_sensor(id(presence_uart));
-      App.register_component(my_sensor);
-      return {my_sensor->motion_amplitude};
+  - platform: r24avd1
+    has_presence: 
+      name: PresenceGenerated
+    has_motion: 
+      name: MotionGenerated
+    has_approach: 
+      name: ApproachGenerated
 
-    sensors:
-    - name: "Movement sign"
-      unit_of_measurement: '%'
-      accuracy_decimals: 0
-  - platform: custom
-    lambda: |-
-      auto veml7700 = new VEML7700CustomSensor();
-      App.register_component(veml7700);
-      return {veml7700->lux_sensor, veml7700->white_sensor, veml7700->als_sensor};
-    sensors:
-      - name: "VEML7700 Light" # Required dummy sensor
-        unit_of_measurement: Lux
-        accuracy_decimals: 0
-      - name: "VEML770 White"
-        unit_of_measurement: raw
-        accuracy_decimals: 0
-      - name: "VEML770 ALS"
-        unit_of_measurement: raw
-        accuracy_decimals: 0
+  # - platform: custom
+  #   lambda: |-
+  #     auto veml7700 = new VEML7700CustomSensor();
+  #     App.register_component(veml7700);
+  #     return {veml7700->lux_sensor, veml7700->white_sensor, veml7700->als_sensor};
+  #   sensors:
+  #     - name: "VEML7700 Light" # Required dummy sensor
+  #       unit_of_measurement: Lux
+  #       accuracy_decimals: 0
+  #     - name: "VEML770 White"
+  #       unit_of_measurement: raw
+  #       accuracy_decimals: 0
+  #     - name: "VEML770 ALS"
+  #       unit_of_measurement: raw
+  #       accuracy_decimals: 0
   - platform: sht3xd
     temperature:
       name: "Temp"
@@ -107,22 +102,6 @@ sensor:
     
 
 
-# NEW
-
-
-
-binary_sensor:
-  - platform: template
-    name: "Presence"
-    id: presence_uart
-    device_class: presence
-    filters:
-      - delayed_on_off: 10ms
-  - platform: template
-    name: "Movement"
-    id: motion_uart
-    device_class: motion
-
 select:
   - platform: template
     name: "Scene (0x04, 0x10)"
@@ -134,15 +113,16 @@ select:
      - "Bedroom (top loading) (0x03)"
      - "Bedroom (top mounted) (0x04)"
      - "Bedroom (top mounted) (0x05)"
-    initial_option: "Default (0x00)"
+    restore_value: true
+    # initial_option: "Default (0x00)"
     optimistic: true
     on_value:
       then:
         - lambda: |-
             ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
-            unsigned char b[1] = {0};
+            uint8_t b[1] = {0};
             b[0] = i;
-            crc::write_to_uart(0x02, 0x04, 0x10, b, 1, id(radar_id));
+            r24avd1::write_to_uart(0x02, 0x04, 0x10, b, 1, id(uart_id));
 
   - platform: template
     name: "Unmanned stall option"
@@ -157,7 +137,8 @@ select:
      - "10min - (0X06)"
      - "30min - (0X07)"
      - "60min - (0X08)"
-    initial_option: "no coersion - (0x00)"
+    # initial_option: "no coersion - (0x00)"
+    restore_value: true
     optimistic: true
 
 button:
@@ -173,19 +154,18 @@ button:
       then:
         - lambda: |-
             ESP_LOGD("packet", "force_into_unmanned_stall: ");
-            // this actuall reads whether there is an unmanned stall
-            // crc::write_to_uart(read_command, system_parameter, force_into_unmanned_stall, NULL, 0, id(radar_id));
-            unsigned char b[1] = {0};
+            uint8_t b[1] = {0};
             auto index = id(select_unmanned_stall).active_index();
             if (index) {
               b[0] = *index;
-              crc::write_to_uart((unsigned char)crc::FunctionCode::WRITE_COMMAND, (unsigned char)crc::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)crc::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(radar_id));
+              r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(uart_id));
             }
 
 number:
   - platform: template
     id: gear_threshold
     name: "Gear Threshold (0x04, 0x0C)"
+    restore_value: true
     optimistic: true
     min_value: 1
     max_value: 10
@@ -193,14 +173,18 @@ number:
     on_value:
       then:
         - lambda: |-
-            unsigned char b[1] = {0};
+            uint8_t b[1] = {0};
             b[0] = id(gear_threshold).state;
-            crc::write_to_uart((unsigned char)crc::FunctionCode::WRITE_COMMAND, (unsigned char)crc::WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)crc::AddressCode2::THRESHOLD_GEAR, b, 1, id(radar_id));
+            r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(uart_id));
 
+# components only really here because they have to be
+binary_sensor:
+
+text_sensor:
 
 
 uart:
-  id: radar_id
+  id: uart_id
   tx_pin: 16
   rx_pin: 17
   baud_rate: 9600
@@ -216,7 +200,3 @@ uart:
       - lambda: UARTDebug::log_string(direction, bytes);
 
 # IMPORTANT: needs to be here so that text_sensor is included in the build directory
-text_sensor:
-  platform: template
-  id: approach_sensor_id
-  name: "Approach"

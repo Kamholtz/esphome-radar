@@ -127,10 +127,20 @@
     {:name "esphome run radar LOUNGE"
      :builder (fn [params] 
                 {:cmd ["esphome"]
-                 :args ["run" "--device" "esphome-web-998ec8.local"  "esphome-web-998ec8.yaml"]
+                 :args ["run" "--device" "COM3" "esphome-external-lounge.yaml" ]
                  :name "esphome run radar LOUNGE"
                  :env {}
-                 :cwd (vim.fn.expand "%:h")
+                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
+                 })})
+
+  (overseer.register_template 
+    {:name "esphome upload radar LOUNGE"
+     :builder (fn [params] 
+                {:cmd ["esphome"]
+                 :args ["upload" "--device" "COM3" "esphome-external-lounge.yaml" ]
+                 :name "esphome upload radar LOUNGE"
+                 :env {}
+                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
                  })})
 
   (overseer.register_template 
