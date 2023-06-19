@@ -109,15 +109,16 @@
                  })})
 
 
-;; -- external, balcony (abf408)
+;; -- external, downstairs (abf408)
 (overseer.register_template 
   {:name "esphome run radar external DOWNSTAIRS"
    :builder (fn [params] 
-              {:cmd ["esphome"]
-               :args ["run" "--device" "esphome-web-abf408.local"  "esphome-external-downstairs.yaml"]
-               :name "esphome run radar external DOWNSTAIRS"
-               :env {}
-               :cwd (vim.fn.expand "%:h")})})
+              (let [this-dir (vim.fn.expand "%:h")] 
+                {:cmd ["esphome"]
+                 :args ["run" "--device" "esphome-web-abf408.local"   "../r24avd1/esphome-web-abf408-external.yaml"]
+                 :name "esphome run radar external DOWNSTAIRS"
+                 :env {}
+                 :cwd (.. this-dir "/../r24avd1-test")}))})
 
 
 (comment
