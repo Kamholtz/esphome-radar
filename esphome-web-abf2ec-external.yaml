@@ -136,3 +136,20 @@ binary_sensor:
       name: Moving Target 2
     has_still_target:
       name: Still Target 2
+
+number:
+  - platform: template
+    id: max_move_distance
+    name: "Max Move Distance"
+    restore_value: true
+    optimistic: true
+    min_value: 0.75
+    max_value: 6
+    step: 0.75
+    on_value:
+      then:
+        - lambda: |-
+            id(uart_1_id).set_config_mode_(true);
+            id(uart_1_id).set_max_move_distance(id(max_move_distance).state);
+            id(uart_1_id).set_config_mode_(false);
+            r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(uart_id));
