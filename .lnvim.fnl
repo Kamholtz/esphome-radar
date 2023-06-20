@@ -111,7 +111,7 @@
 
 ;; -- external, downstairs (abf408)
 (overseer.register_template 
-  {:name "esphome run radar external DOWNSTAIRS"
+  {:name "esphome run radar external ENTRANCE"
    :builder (fn [params] 
               (let [this-dir (vim.fn.expand "%:h")] 
                 {:cmd ["esphome"]
@@ -120,6 +120,37 @@
                  :env {}
                  :cwd (.. this-dir "/../r24avd1-test")}))})
 
+  (overseer.register_template 
+    {:name "esphome clean radar ENTRANCE"
+     :builder (fn [params] 
+                {:cmd ["esphome"]
+                 :args ["clean" "../r24avd1/esphome-abf408-entrance-1.yaml"]
+                 :name "esphome clean DOWNSTAIRS"
+                 :env {}
+                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
+                 ; :strategy {1 :jobstart :use_terminal false}
+                 })})
+
+(overseer.register_template 
+    {:name "esphome run radar COM ENTRANCE"
+     :builder (fn [params] 
+                {:cmd ["esphome"]
+                 :args ["run" "--device" "COM3" "../r24avd1/esphome-abf408-entrance-1.yaml" ]
+                 :name "esphome run radar ENTRANCE"
+                 :env {}
+                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
+                 })})
+
+(overseer.register_template 
+    {:name "esphome log radar COM ENTRANCE"
+     :builder (fn [param(.. (vim.fn.expand "%:h") "/../r24avd1-test")s] 
+                {:cmd ["esphome"]
+                 :args ["logs" "../r24avd1/esphome-abf408-entrance-1.yaml" "--client-id" "esphome-abf408-entrance-1.local"]
+                 :name "esphome clean radar ENTRANCE"
+                 :env {}
+                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
+                 ; :strategy {1 :jobstart :use_terminal false}
+                 })})
 
 (comment
 
