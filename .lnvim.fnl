@@ -110,18 +110,6 @@
 
 
 ;; -- external, downstairs (abf408)
-(overseer.register_template 
-  {:name "esphome run radar external ENTRANCE"
-   :builder (fn [params] 
-              {:cmd ["esphome"]
-                 :args ["run" "--device" "esphome-abf408-entrance-1.local" "../r24avd1/esphome-abf408-entrance-1.yaml"]
-                 :name "esphome run radar external DOWNSTAIRS"
-                 :env {}
-                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
-
-  
-
-
 
 (do
 
@@ -138,6 +126,7 @@
 
       (when device 
         (do 
+          ;; run (COM)
           (overseer.register_template 
             {:name (get-name-fn :run device)
              :builder (fn [params] 
@@ -147,12 +136,23 @@
                          :env {}
                          :cwd cwd})})
 
+          ;; upload (COM)
           (overseer.register_template 
             {:name (get-name-fn :upload device)
              :builder (fn [params] 
                         {:cmd ["esphome"]
                          :args [:upload "--device" device yaml-path]
                          :name (get-name-fn :upload device)
+                         :env {}
+                         :cwd cwd})})
+
+          ;; logs (COM)
+          (overseer.register_template 
+            {:name (get-name-fn :logs device)
+             :builder (fn [params] 
+                        {:cmd ["esphome"]
+                         :args [:logs yaml-path "--client-id" device]
+                         :name (get-name-fn :logs device)
                          :env {}
                          :cwd cwd})})))
 
@@ -166,7 +166,8 @@
                      :name (get-name-fn :run)
                      :env {}
                      :cwd cwd})})
-      
+
+      ;; upload (IP)
       (overseer.register_template 
         {:name (get-name-fn :upload client-id)
          :builder (fn [params] 
@@ -176,7 +177,7 @@
                      :env {}
                      :cwd cwd})})
 
-      ;; logs
+      ;; logs (IP)
       (overseer.register_template 
         {:name (get-name-fn :logs)
          :builder (fn [params] 
@@ -185,7 +186,7 @@
                      :name (get-name-fn :logs)
                      :env {}
                      :cwd cwd})})
-      
+
       ;; clean 
       (overseer.register_template 
         {:name (get-name-fn :clean)
