@@ -85,31 +85,11 @@
                :name "esphome compile radar OFFICE"
                :env {}
                :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
-
+
+
 
 ;; --- external, balcony (abf2ec)
-(overseer.register_template 
-  {:name "esphome run radar external BALCONY"
-   :builder (fn [params] 
-              {:cmd ["esphome"]
-               :args ["run" "--device" "esphome-web-radar-1.local"  "esphome-external-balcony.yaml"]
-               :name "esphome run radar external BALCONY"
-               :env {}
-               :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
-
-(overseer.register_template 
-    {:name "esphome log radar BALCONY"
-     :builder (fn [params] 
-                {:cmd ["esphome"]
-                 :args ["logs" "esphome-external-balcony.yaml" "--client-id" "esphome-web-radar-1.local"]
-                 :name "esphome clean radar BALCONY"
-                 :env {}
-                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
-                 ; :strategy {1 :jobstart :use_terminal false}
-                 })})
-
-
-;; -- external, downstairs (abf408)
+;; --- external, downstairs (abf408)
 
 (do
 
@@ -187,6 +167,15 @@
                      :env {}
                      :cwd cwd})})
 
+      (overseer.register_template 
+        {:name (get-name-fn :compile)
+         :builder (fn [params] 
+                    {:cmd ["esphome"]
+                     :args ["compile" yaml-path]
+                     :name (get-name-fn :compile)
+                     :env {}
+                     :cwd cwd})})
+
       ;; clean 
       (overseer.register_template 
         {:name (get-name-fn :clean)
@@ -202,6 +191,7 @@
                               "COM3"
                               "../r24avd1/esphome-abf408-entrance-1.yaml"
                               (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
+
   )
 
 (overseer.register_template 
