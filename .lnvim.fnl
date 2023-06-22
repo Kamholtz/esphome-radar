@@ -119,17 +119,7 @@
                  :env {}
                  :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
 
-  (overseer.register_template 
-    {:name "esphome clean radar ENTRANCE"
-     :builder (fn [params] 
-                {:cmd ["esphome"]
-                 :args ["clean" "../r24avd1/esphome-abf408-entrance-1.yaml"]
-                 :name "esphome clean DOWNSTAIRS"
-                 :env {}
-                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
-                 ; :strategy {1 :jobstart :use_terminal false}
-                 })})
-
+  
 (overseer.register_template 
     {:name "esphome run radar COM ENTRANCE"
      :builder (fn [params] 
@@ -146,12 +136,24 @@
   (defn register-esphome-templates [name client-id device yaml-path cwd] 
     (let [cmd ["esphome"]
           name-prefix "esphome: "]
+
+      ;; logs
       (overseer.register_template 
         {:name (.. name-prefix "logs " name)
          :builder (fn [params] 
                     {:cmd ["esphome"]
                      :args ["logs" yaml-path "--client-id" client-id]
                      :name (.. name-prefix "logs" name)
+                     :env {}
+                     :cwd cwd})})
+      
+      ;; clean 
+      (overseer.register_template 
+        {:name (.. name-prefix "clean " name)
+         :builder (fn [params] 
+                    {:cmd ["esphome"]
+                     :args ["clean" yaml-path]
+                     :name (.. name-prefix "clean " name)
                      :env {}
                      :cwd cwd})})))
 
