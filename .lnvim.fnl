@@ -154,23 +154,30 @@
                      :env {}
                      :cwd cwd})})))
 
-  ;; --- external, office (ac358c)
+  ;; --- external, downstairs (abf408)
   (register-esphome-templates "Entrance"
                               "esphome-abf408-entrance-1.local" 
                               "COM3"
                               "../r24avd1/esphome-abf408-entrance-1.yaml"
                               (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
 
-  ;; --- external, downstairs (abf408)
+  ;; --- external, office (ac358c)
   (register-esphome-templates "External Office"
-                              "esphome-abf408-entrance-1.local" 
+                              "esphome-web-ac358c.local" 
                               "COM3"
                               "esphome-external.yaml"
                               (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
-  ;; --- external, balcony (abf2ec)
 
+  (register-esphome-templates "Office"
+                              "esphome-web-ac358c.local" 
+                              "COM3"
+                              "../r24avd1/esphome-web-ac358c.yaml"
+                              (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
+
+  ;; --- external, balcony (abf2ec)
 )
-
+
+
 (overseer.register_template 
     {:name "esphome log radar COM ENTRANCE"
      :builder (fn [params] 
