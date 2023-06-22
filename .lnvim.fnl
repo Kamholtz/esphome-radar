@@ -120,40 +120,44 @@
                  :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
 
   
-(overseer.register_template 
-    {:name "esphome run radar COM ENTRANCE"
-     :builder (fn [params] 
-                {:cmd ["esphome"]
-                 :args ["run" "--device" "COM3" "../r24avd1/esphome-abf408-entrance-1.yaml" ]
-                 :name "esphome run radar ENTRANCE"
-                 :env {}
-                 :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")
-                 })})
+
 
 
 (do
 
   (defn register-esphome-templates [name client-id device yaml-path cwd] 
     (let [cmd ["esphome"]
-          name-prefix "esphome: "]
+          name-prefix "esphome: "
+          get-name-fn (fn [cmd device-2] 
+                        (.. name-prefix name " " cmd (or (and device-2 (.. " " device-2))
+                                                         "")))]
+
+      (overseer.register_template 
+        {:name (get-name-fn :run device)
+         :builder (fn [params] 
+                    {:cmd ["esphome"]
+                     :args ["run" "--device" device yaml-path]
+                     :name (get-name-fn :run device)
+                     :env {}
+                     :cwd cwd})})
 
       ;; logs
       (overseer.register_template 
-        {:name (.. name-prefix "logs " name)
+        {:name (get-name-fn :logs)
          :builder (fn [params] 
                     {:cmd ["esphome"]
                      :args ["logs" yaml-path "--client-id" client-id]
-                     :name (.. name-prefix "logs" name)
+                     :name (get-name-fn :logs)
                      :env {}
                      :cwd cwd})})
       
       ;; clean 
       (overseer.register_template 
-        {:name (.. name-prefix "clean " name)
+        {:name (get-name-fn :clean)
          :builder (fn [params] 
                     {:cmd ["esphome"]
                      :args ["clean" yaml-path]
-                     :name (.. name-prefix "clean " name)
+                     :name (get-name-fn :clean)
                      :env {}
                      :cwd cwd})})))
 
