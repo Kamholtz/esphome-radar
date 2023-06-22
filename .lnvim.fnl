@@ -129,15 +129,50 @@
     (let [cmd ["esphome"]
           name-prefix "esphome: "
           get-name-fn (fn [cmd device-2] 
-                        (.. name-prefix name " " cmd (or (and device-2 (.. " " device-2))
-                                                         "")))]
+                        (.. name-prefix 
+                            name " " cmd 
+                            (or (and device-2 
+                                     (.. " " device-2))
+                                "")))
+          ]
 
+      (when device 
+        (do 
+          (overseer.register_template 
+            {:name (get-name-fn :run device)
+             :builder (fn [params] 
+                        {:cmd ["esphome"]
+                         :args ["run" "--device" device yaml-path]
+                         :name (get-name-fn :run device)
+                         :env {}
+                         :cwd cwd})})
+
+          (overseer.register_template 
+            {:name (get-name-fn :upload device)
+             :builder (fn [params] 
+                        {:cmd ["esphome"]
+                         :args [:upload "--device" device yaml-path]
+                         :name (get-name-fn :upload device)
+                         :env {}
+                         :cwd cwd})})))
+
+
+      ;; run (IP)
       (overseer.register_template 
-        {:name (get-name-fn :run device)
+        {:name (get-name-fn :run)
          :builder (fn [params] 
                     {:cmd ["esphome"]
-                     :args ["run" "--device" device yaml-path]
-                     :name (get-name-fn :run device)
+                     :args [:run "--device" client-id yaml-path]
+                     :name (get-name-fn :run)
+                     :env {}
+                     :cwd cwd})})
+      
+      (overseer.register_template 
+        {:name (get-name-fn :upload client-id)
+         :builder (fn [params] 
+                    {:cmd ["esphome"]
+                     :args [:upload "--device" client-id yaml-path]
+                     :name (get-name-fn :upload client-id)
                      :env {}
                      :cwd cwd})})
 
@@ -146,7 +181,7 @@
         {:name (get-name-fn :logs)
          :builder (fn [params] 
                     {:cmd ["esphome"]
-                     :args ["logs" yaml-path "--client-id" client-id]
+                     :args [:logs yaml-path "--client-id" client-id]
                      :name (get-name-fn :logs)
                      :env {}
                      :cwd cwd})})
@@ -156,7 +191,7 @@
         {:name (get-name-fn :clean)
          :builder (fn [params] 
                     {:cmd ["esphome"]
-                     :args ["clean" yaml-path]
+                     :args [:clean yaml-path]
                      :name (get-name-fn :clean)
                      :env {}
                      :cwd cwd})})))
