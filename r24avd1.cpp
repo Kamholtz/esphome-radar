@@ -77,6 +77,14 @@ uint16_t write_to_uart(unsigned char function_code,
 }
 
 
+uint16_t R24AVD1Component::write_select_scene(uint8_t scene) {
+    // ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
+    uint8_t data[1] = { scene };
+    uart::UARTDevice * this_uart = (uart::UARTDevice*)this;
+    return write_to_uart(0x02, 0x04, 0x10, data, 1, *this_uart);
+}
+
+
 int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initial_pos) {
   int pos = initial_pos;
 

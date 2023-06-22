@@ -138,6 +138,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     sensor::Sensor *motion_amplitude = new sensor::Sensor();
     void set_approach_text_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
     void set_scene_select(select::Select *sens) { this->scene_select_ = sens; };
+    uint16_t write_select_scene(uint8_t scene);
 
     void setup() override;
     void dump_config() override;
