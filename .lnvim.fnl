@@ -58,38 +58,6 @@
                :cwd (vim.fn.expand "%:h")
                })})
 
-;; --- external, office (ac358c)
-(overseer.register_template 
-  {:name "esphome run radar external OFFICE"
-   :builder (fn [params] 
-              {:cmd ["esphome"]
-               :args ["run" "-v" "--device" "esphome-external.yaml"]
-               :name "esphome run radar external OFFICE"
-               :env {}
-               :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
-
-(overseer.register_template 
-  {:name "esphome clean external OFFICE"
-   :builder (fn [params] 
-              {:cmd ["esphome"]
-               :args ["clean" "esphome-external.yaml"]
-               :name "esphome clean radar external OFFICE"
-               :env {}
-               :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
-
-(overseer.register_template 
-  {:name "esphome compile radar external OFFICE"
-   :builder (fn [params] 
-              {:cmd ["esphome"]
-               :args ["compile" "esphome-external.yaml"]
-               :name "esphome compile radar OFFICE"
-               :env {}
-               :cwd (.. (vim.fn.expand "%:h") "/../r24avd1-test")})})
-
-
-
-;; --- external, balcony (abf2ec)
-;; --- external, downstairs (abf408)
 
 (do
 
@@ -186,13 +154,22 @@
                      :env {}
                      :cwd cwd})})))
 
+  ;; --- external, office (ac358c)
   (register-esphome-templates "Entrance"
                               "esphome-abf408-entrance-1.local" 
                               "COM3"
                               "../r24avd1/esphome-abf408-entrance-1.yaml"
                               (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
 
-  )
+  ;; --- external, downstairs (abf408)
+  (register-esphome-templates "External Office"
+                              "esphome-abf408-entrance-1.local" 
+                              "COM3"
+                              "esphome-external.yaml"
+                              (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
+  ;; --- external, balcony (abf2ec)
+
+)
 
 (overseer.register_template 
     {:name "esphome log radar COM ENTRANCE"
