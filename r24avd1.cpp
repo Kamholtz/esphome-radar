@@ -142,27 +142,17 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
             } else {
 
               // Is this packet different to the last?
-              // TODO: is there some other buffer compare in std?
               bool is_packet_equal = std::equal(buffer,buffer + data_len, prev_buffer);
-              // bool is_packet_equal = true;
-              // for (uint8_t ii = data_len; ii != 0; ii++) {
-              //   is_packet_equal &= prev_buffer[ii] == buffer;
-              // }
               if (is_packet_equal) {
                 ESP_LOGD(TAG, "This packet is equivalent to the last packet");
               } else {
                 std:memcpy(prev_buffer, buffer, data_len);
               }
 
-
-
               // we don't expect data_len to be larger than a 4 byte float
               float_data motion_amplitude_prev;
               float_data float_data_curr_union;
-              for (uint8_t data_ii = 0; data_ii < data_len; data_ii++) {
-                float_data_curr_union.data[data_ii] = buffer[DATA_START_IDX + data_ii];
-              }
-
+              std::memcpy(float_data_curr_union.data, (buffer + DATA_START_IDX), data_len);
               ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_curr_union.data[0], float_data_curr_union.data[1], float_data_curr_union.data[2], float_data_curr_union.data[3]);
 
 
