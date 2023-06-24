@@ -15,8 +15,7 @@
     (let [cmd ["esphome"]
           name-prefix "esphome: "
           get-name-fn (fn [cmd device-2] 
-                        (.. name-prefix 
-                            name " " cmd 
+                        (.. name-prefix name " " cmd 
                             (or (and device-2 
                                      (.. " " device-2))
                                 "")))]
@@ -108,25 +107,26 @@
                      :cwd cwd})})))
 
   ;; --- external, downstairs (abf408)
-  (register-esphome-templates "Entrance"
-                              "esphome-abf408-entrance-1.local" 
-                              "COM3"
-                              "../r24avd1/esphome-abf408-entrance-1.yaml"
-                              (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
+  (let [this-path (vim.fn.expand "%:h")] 
+    (register-esphome-templates "Entrance"
+                                "esphome-abf408-entrance-1.local" 
+                                "COM3"
+                                "../r24avd1/esphome-abf408-entrance-1.yaml"
+                                (.. this-path "/../r24avd1-test"))
 
-  ;; --- external, office (ac358c)
-  (register-esphome-templates "External Office"
-                              "esphome-web-ac358c.local" 
-                              "COM3"
-                              "esphome-external-lounge.yaml"
-                              (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
+    ;; --- external, office (ac358c)
+    (register-esphome-templates "External Office"
+                                "esphome-web-ac358c.local" 
+                                "COM3"
+                                "esphome-external-lounge.yaml"
+                                (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
 
-  ;; --- lounge (998ec8)
-  (register-esphome-templates "Lounge"
-                              "esphome-web-998ec8.local" 
-                              "COM3"
-                              "../r24avd1/esphome-web-998ec8.yaml"
-                              (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
+    ;; --- lounge (998ec8)
+    (register-esphome-templates "Lounge"
+                                "esphome-web-998ec8.local" 
+                                "COM3"
+                                "../r24avd1/esphome-web-998ec8.yaml"
+                                (.. (vim.fn.expand "%:h") "/../r24avd1-test")))
 
   ;; --- external, office (ac358c)
   ;; Not in use
