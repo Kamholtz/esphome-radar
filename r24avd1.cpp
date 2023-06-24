@@ -6,6 +6,7 @@ namespace r24avd1 {
 
 static const char *const TAG = "r24avd1";
 
+
 void R24AVD1Component::setup() {
   // nothing to do
 
@@ -28,11 +29,12 @@ void R24AVD1Component::dump_config() {
 void R24AVD1Component::loop() {
   const int max_line_length = 80;
   static uint8_t buffer[max_line_length];
+  static uint8_t prev_buffer[PACKET_MAX_LEN];
 
   int pos = 0;
 
   while (available()) {
-    pos = this->readline_(read(), buffer, max_line_length, pos);
+    pos = this->readline_(read(), buffer, max_line_length, prev_buffer, PACKET_MAX_LEN, pos);
   }
 }
 
@@ -94,7 +96,7 @@ uint16_t R24AVD1Component::write_select_scene(uint8_t scene) {
 }
 
 
-int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initial_pos) {
+int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *prev_buffer, int prev_len, int initial_pos) {
   int pos = initial_pos;
 
   if (readch >= 0) {
@@ -111,6 +113,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
       const uint16_t pkt_len_incl_start = pkt_len + 1;
 
       if (pkt_len_incl_start > PACKET_MAX_LEN) {
+        // invalid
         ESP_LOGI(TAG, "Total packet len (%d) too long, discarding", pkt_len_incl_start);
         pos = 0;
       } else {
@@ -136,6 +139,22 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
               ESP_LOGI(TAG, "Data len (%d) too long, discarding", data_len);
 
             } else {
+
+              // Is this packet different to the last?
+              // TODO: is there some other buffer compare in std?
+              bool is_packet_equal = std::equal(buffer,buffer + data_len, prev_buffer);
+              // bool is_packet_equal = true;
+              // for (uint8_t ii = data_len; ii != 0; ii++) {
+              //   is_packet_equal &= prev_buffer[ii] == buffer;
+              // }
+              if (is_packet_equal) {
+                ESP_LOGD(TAG, "This packet is equivalent to the last packet");
+              } else {
+                std:memcpy(prev_buffer, buffer, data_len);
+              }
+
+
+
               // we don't expect data_len to be larger than a 4 byte float
               float_data motion_amplitude_prev;
               float_data float_data_curr_union;
