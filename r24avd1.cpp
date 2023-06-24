@@ -133,6 +133,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
           uint16_t calculated_crc = crc::us_calculate_crc16(buffer, pkt_len_incl_start - CRC_LEN);
           if ((((calculated_crc >> 8) & 0xFF) == crc_l) &&
               (((calculated_crc & 0xFF)) == crc_h)) {
+            //Complete packet obtained
 
             if (data_len > DATA_MAX_LEN) {
               // Invalid
@@ -166,28 +167,19 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
 
 
               // --- motion amplitude
-              // CACHE the last array here
               if (this->motion_amplitude_sensor_ != nullptr &&
                   function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == 0x06) {
 
                 // each byte equal?
-                bool all_equal = true;
-                all_equal &= (motion_amplitude_prev.data[0] == float_data_curr_union.data[0]);
-                all_equal &= (motion_amplitude_prev.data[1] == float_data_curr_union.data[1]);
-                all_equal &= (motion_amplitude_prev.data[2] == float_data_curr_union.data[2]);
-                all_equal &= (motion_amplitude_prev.data[3] == float_data_curr_union.data[3]);
-
+                bool all_equal = std::equal(motion_amplitude_prev.data, motion_amplitude_prev.data + DATA_MAX_LEN, float_data_curr_union.data);
                 if (!all_equal) {
                   ESP_LOGD(TAG, "motion_amplitude: %f", float_data_curr_union.f);
                   this->motion_amplitude_sensor_->publish_state(float_data_curr_union.f);
                   
                   // cache for comparison later
-                  motion_amplitude_prev.data[0] = float_data_curr_union.data[0];
-                  motion_amplitude_prev.data[1] = float_data_curr_union.data[1];
-                  motion_amplitude_prev.data[2] = float_data_curr_union.data[2];
-                  motion_amplitude_prev.data[3] = float_data_curr_union.data[3];
+                  std::memcpy(motion_amplitude_prev.data, float_data_curr_union.data, 4);
                 }
               }
 
