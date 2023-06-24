@@ -95,6 +95,12 @@ uint16_t R24AVD1Component::write_select_scene(uint8_t scene) {
     return write_to_uart(0x02, 0x04, 0x10, data, 1, *this_uart);
 }
 
+uint16_t R24AVD1Component::write_select_gear_threshold(uint8_t gear_threshold) {
+    uint8_t data[1] = { gear_threshold };
+    uart::UARTDevice * this_uart = (uart::UARTDevice*)this;
+    return write_to_uart((uint8_t)FunctionCode::WRITE_COMMAND, (uint8_t)WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)AddressCode2::THRESHOLD_GEAR, data, 1, *this_uart);
+}
+
 
 int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *prev_buffer, int prev_len, int initial_pos) {
   int pos = initial_pos;

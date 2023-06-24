@@ -120,7 +120,7 @@ enum class UnmannedStallData0 {
 };
 
 using float_data = union {
-  uint8_t data[4];
+  uint8_t data[DATA_MAX_LEN];
   float f;
 };
 
@@ -137,8 +137,11 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     void set_presence_binary_sensor(binary_sensor::BinarySensor *sens) { this->presence_binary_sensor_ = sens; };
     void set_approach_text_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
     void set_motion_amplitude_sensor(sensor::Sensor *sens) { this->motion_amplitude_sensor_ = sens; };
+    // TODO: remove
     void set_scene_select(select::Select *sens) { this->scene_select_ = sens; };
+
     uint16_t write_select_scene(uint8_t scene);
+    uint16_t write_select_gear_threshold(uint8_t gear_threshold);
 
     void setup() override;
     void dump_config() override;
