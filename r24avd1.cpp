@@ -167,9 +167,6 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
 
                 if (!all_equal) {
                   ESP_LOGD(TAG, "float_data_union: %f", float_data_curr_union.f);
-                  
-
-                  LOG_SENSOR("  ", "Motion Amplitude", this->motion_amplitude_sensor_);
                   this->motion_amplitude_sensor_->publish_state(float_data_curr_union.f);
                   
                   // cache for comparison later
@@ -187,24 +184,29 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
 
                 ESP_LOGD(TAG, "approach_status: %X", float_data_curr_union.data[APPROACH_DATA_IDX]);
 
-                std::string state_str;
+                const char unknown_string[] = "Unknown";
+                const char none_string[] = "None";
+                const char close_string[] = "Close";
+                const char far_string[] = "Far";
+                char * state_str;
+
                 switch (float_data_curr_union.data[APPROACH_DATA_IDX]) {
                   case (uint8_t)ApproachStatus::NONE:
-                    state_str = "None";
+                    state_str = (char*)none_string;
                     break;
                   case (uint8_t)ApproachStatus::CLOSE:
-                    state_str = "Close";
+                    state_str = (char*)close_string;
                     break;
                   case (uint8_t)ApproachStatus::FAR:
-                    state_str = "Far";
+                    state_str = (char*)far_string;
                     break;
                   default:
-                    state_str = "";
+                    state_str = (char*)unknown_string;
                     break;
                 }
 
                 if (this->approach_text_sensor_ != nullptr && this->approach_text_sensor_->get_state() != state_str) {
-                  LOG_TEXT_SENSOR("  ", "Approach", this->approach_text_sensor_);
+                  ESP_LOGD(TAG, "Approach: %s", state_str);
                   this->approach_text_sensor_->publish_state(state_str);
                 }
               }
@@ -214,7 +216,6 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == (uint8_t)AddressCode2::ENVIRONMENT_STATUS) {
 
-                ESP_LOGD(TAG, "motion_binary: %X", float_data_curr_union.data[0]);
 
                 bool presence = false;
                 bool motion = false;
@@ -237,13 +238,15 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                     break;
                 }
 
+                const char false_string[] = "FALSE";
+                const char true_string[] = "TRUE";
                 if (this->motion_binary_sensor_ != nullptr && this->motion_binary_sensor_->state != motion) {
-                  LOG_BINARY_SENSOR("  ", "Motion", this->motion_binary_sensor_);
+                  ESP_LOGD(TAG, "motion: %s", motion ? true_string : false_string);
                   this->motion_binary_sensor_->publish_state(motion);
                 }
 
                 if (this->presence_binary_sensor_ != nullptr && this->presence_binary_sensor_->state != presence) {
-                  LOG_BINARY_SENSOR("  ", "Presence", this->presence_binary_sensor_);
+                  ESP_LOGD(TAG, "presence: %s", presence ? true_string : false_string);
                   this->presence_binary_sensor_->publish_state(presence);
                 }
               }
