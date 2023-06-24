@@ -134,6 +134,8 @@ sensor:
       name: Motion
     has_approach: 
       name: Approach
+    has_motion_amplitude: 
+      name: Motion Amplitude
 
 
 # IMPORTANT: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome

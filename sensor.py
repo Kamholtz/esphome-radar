@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import uart, binary_sensor, text_sensor, select # TODO: text_sensor, select, number, button
+from esphome.components import uart, binary_sensor, text_sensor, select, sensor # TODO: text_sensor, select, number, button
 from esphome.const import (
     CONF_ID,
     DEVICE_CLASS_PRESENCE,
@@ -19,6 +19,7 @@ CONF_HAS_PRESENCE = "has_presence"
 CONF_HAS_MOTION = "has_motion"
 CONF_HAS_APPROACH = "has_approach"
 CONF_HAS_SCENE = "has_scene"
+CONF_HAS_MOTION_AMPLITUDE = "has_motion_amplitude"
 
 
 CONFIG_SCHEMA = (
@@ -34,6 +35,9 @@ CONFIG_SCHEMA = (
                 device_class=DEVICE_CLASS_MOTION
             ),
             cv.Optional(CONF_HAS_APPROACH): text_sensor.text_sensor_schema(
+                # icon=ICON_ACCURACY # TODO: find icon to use here
+            ),
+            cv.Optional(CONF_HAS_MOTION_AMPLITUDE): sensor.sensor_schema(
                 # icon=ICON_ACCURACY # TODO: find icon to use here
             ),
         }
@@ -77,3 +81,6 @@ async def to_code(config):
     if CONF_HAS_APPROACH in config:
         sens = await text_sensor.new_text_sensor(config[CONF_HAS_APPROACH])
         cg.add(var.set_approach_text_sensor(sens))
+    if CONF_HAS_MOTION_AMPLITUDE in config:
+        sens = await sensor.new_sensor(config[CONF_HAS_MOTION_AMPLITUDE])
+        cg.add(var.set_motion_amplitude_sensor(sens))

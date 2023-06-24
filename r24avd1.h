@@ -135,8 +135,8 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     sensor::Sensor *motion_binary_sensor = new sensor::Sensor();
     void set_motion_binary_sensor(binary_sensor::BinarySensor *sens) { this->motion_binary_sensor_ = sens; };
     void set_presence_binary_sensor(binary_sensor::BinarySensor *sens) { this->presence_binary_sensor_ = sens; };
-    sensor::Sensor *motion_amplitude = new sensor::Sensor();
     void set_approach_text_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
+    void set_motion_amplitude_sensor(sensor::Sensor *sens) { this->motion_amplitude_sensor_ = sens; };
     void set_scene_select(select::Select *sens) { this->scene_select_ = sens; };
     uint16_t write_select_scene(uint8_t scene);
 
@@ -148,6 +148,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
   protected:
     int readline_(int readch, uint8_t *buffer, int len, int initial_pos); 
     text_sensor::TextSensor *approach_text_sensor_{nullptr};
+    sensor::Sensor *motion_amplitude_sensor_ = {nullptr};
     binary_sensor::BinarySensor *motion_binary_sensor_{nullptr};
     binary_sensor::BinarySensor *presence_binary_sensor_{nullptr};
     select::Select *scene_select_{nullptr};

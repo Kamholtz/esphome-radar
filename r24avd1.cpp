@@ -149,13 +149,15 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
 
 
               // motion parameter
-              if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+              // CACHE the last array here
+              if (this->motion_amplitude_sensor_ != nullptr &&
+                  function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == 0x06 && 
-                  this->motion_amplitude->get_state() != float_data_union.f) {
+                  this->motion_amplitude_sensor_->get_state() != float_data_union.f) {
 
                 ESP_LOGD(TAG, "float_data_union: %f", float_data_union.f);
-                this->motion_amplitude->publish_state(float_data_union.f);
+                this->motion_amplitude_sensor_->publish_state(float_data_union.f);
               }
 
               if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
