@@ -19,9 +19,9 @@
                             name " " cmd 
                             (or (and device-2 
                                      (.. " " device-2))
-                                "")))
-          ]
+                                "")))]
 
+      ;; --- COM port commands
       (when device 
         (do 
           ;; run (COM)
@@ -55,6 +55,7 @@
                          :cwd cwd})})))
 
 
+      ;; --- IP commands
       ;; run (IP)
       (overseer.register_template 
         {:name (get-name-fn :run)
@@ -85,6 +86,8 @@
                      :env {}
                      :cwd cwd})})
 
+      ;; --- local commands
+      ;; compile 
       (overseer.register_template 
         {:name (get-name-fn :compile)
          :builder (fn [params] 
@@ -94,7 +97,7 @@
                      :env {}
                      :cwd cwd})})
 
-      ;; clean 
+      ;; clean
       (overseer.register_template 
         {:name (get-name-fn :clean)
          :builder (fn [params] 
@@ -124,7 +127,9 @@
                               "COM3"
                               "../r24avd1/esphome-web-998ec8.yaml"
                               (.. (vim.fn.expand "%:h") "/../r24avd1-test"))
-  ;; --- external, office (ac358c)
 
+  ;; --- external, office (ac358c)
+  ;; Not in use
   ;; --- external, balcony (abf2ec)
+  ;; Not in use
 )
