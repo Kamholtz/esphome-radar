@@ -142,7 +142,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
 
             } else {
               // we don't expect data_len to be larger than a 4 byte float
-              float_data float_data_prev_union;
+              float_data motion_amplitude_prev;
               float_data float_data_curr_union;
               for (uint8_t data_ii = 0; data_ii < data_len; data_ii++) {
                 float_data_curr_union.data[data_ii] = buffer[DATA_START_IDX + data_ii];
@@ -151,32 +151,36 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
               ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_curr_union.data[0], float_data_curr_union.data[1], float_data_curr_union.data[2], float_data_curr_union.data[3]);
 
 
-              // motion parameter
+              // --- motion amplitude
               // CACHE the last array here
               if (this->motion_amplitude_sensor_ != nullptr &&
                   function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == 0x06) {
 
-                // eqch byte equal?
+                // each byte equal?
                 bool all_equal = true;
-                all_equal &= (float_data_prev_union.data[0] == float_data_curr_union.data[0]);
-                all_equal &= (float_data_prev_union.data[1] == float_data_curr_union.data[1]);
-                all_equal &= (float_data_prev_union.data[2] == float_data_curr_union.data[2]);
-                all_equal &= (float_data_prev_union.data[3] == float_data_curr_union.data[3]);
+                all_equal &= (motion_amplitude_prev.data[0] == float_data_curr_union.data[0]);
+                all_equal &= (motion_amplitude_prev.data[1] == float_data_curr_union.data[1]);
+                all_equal &= (motion_amplitude_prev.data[2] == float_data_curr_union.data[2]);
+                all_equal &= (motion_amplitude_prev.data[3] == float_data_curr_union.data[3]);
 
                 if (!all_equal) {
                   ESP_LOGD(TAG, "float_data_union: %f", float_data_curr_union.f);
+                  
+
+                  LOG_SENSOR("  ", "Motion Amplitude", this->motion_amplitude_sensor_);
                   this->motion_amplitude_sensor_->publish_state(float_data_curr_union.f);
                   
                   // cache for comparison later
-                  float_data_prev_union.data[0] = float_data_curr_union.data[0];
-                  float_data_prev_union.data[1] = float_data_curr_union.data[1];
-                  float_data_prev_union.data[2] = float_data_curr_union.data[2];
-                  float_data_prev_union.data[3] = float_data_curr_union.data[3];
+                  motion_amplitude_prev.data[0] = float_data_curr_union.data[0];
+                  motion_amplitude_prev.data[1] = float_data_curr_union.data[1];
+                  motion_amplitude_prev.data[2] = float_data_curr_union.data[2];
+                  motion_amplitude_prev.data[3] = float_data_curr_union.data[3];
                 }
               }
 
+              // --- approach status
               if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == 0x07) {
@@ -200,10 +204,12 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                 }
 
                 if (this->approach_text_sensor_ != nullptr && this->approach_text_sensor_->get_state() != state_str) {
+                  LOG_TEXT_SENSOR("  ", "Approach", this->approach_text_sensor_);
                   this->approach_text_sensor_->publish_state(state_str);
                 }
               }
 
+              // motion/presence 
               if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == (uint8_t)AddressCode2::ENVIRONMENT_STATUS) {
@@ -231,13 +237,13 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                     break;
                 }
 
-                LOG_BINARY_SENSOR("  ", "Motion", this->motion_binary_sensor_);
                 if (this->motion_binary_sensor_ != nullptr && this->motion_binary_sensor_->state != motion) {
+                  LOG_BINARY_SENSOR("  ", "Motion", this->motion_binary_sensor_);
                   this->motion_binary_sensor_->publish_state(motion);
                 }
 
-                LOG_BINARY_SENSOR("  ", "Presence", this->presence_binary_sensor_);
                 if (this->presence_binary_sensor_ != nullptr && this->presence_binary_sensor_->state != presence) {
+                  LOG_BINARY_SENSOR("  ", "Presence", this->presence_binary_sensor_);
                   this->presence_binary_sensor_->publish_state(presence);
                 }
               }
