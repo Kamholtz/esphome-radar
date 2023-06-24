@@ -125,12 +125,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
 
           //TODO: check CRC is valid
           
-          ESP_LOGD(TAG, "function_code: %X", function_code);
-          ESP_LOGD(TAG, "address_code_1: %X", address_code_1);
-          ESP_LOGD(TAG, "address_code_2: %X", address_code_2);
-          ESP_LOGD(TAG, "crc_l: %X", crc_l);
-          ESP_LOGD(TAG, "crc_h: %X", crc_h);
-          ESP_LOGD(TAG, "data_len: %d", data_len);
+          ESP_LOGD(TAG, "function_code: %X, address_code_1: %X, address_code_2: %X, crc_l: %X, crc_h: %X, data_len: %d", function_code, address_code_1, address_code_2, crc_l, crc_h, data_len);
 
           uint16_t calculated_crc = crc::us_calculate_crc16(buffer, pkt_len_incl_start - CRC_LEN);
           if ((((calculated_crc >> 8) & 0xFF) == crc_l) &&
@@ -166,7 +161,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                 all_equal &= (motion_amplitude_prev.data[3] == float_data_curr_union.data[3]);
 
                 if (!all_equal) {
-                  ESP_LOGD(TAG, "float_data_union: %f", float_data_curr_union.f);
+                  ESP_LOGD(TAG, "motion_amplitude: %f", float_data_curr_union.f);
                   this->motion_amplitude_sensor_->publish_state(float_data_curr_union.f);
                   
                   // cache for comparison later
