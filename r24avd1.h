@@ -146,7 +146,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
 
   protected:
-    int readline_(int readch, uint8_t *buffer, int len, int initial_pos); 
+    int readline_(int readch, uint8_t *buffer, int len, uint8_t *prev_buffer, int prev_len, int initial_pos); 
     text_sensor::TextSensor *approach_text_sensor_{nullptr};
     sensor::Sensor *motion_amplitude_sensor_ = {nullptr};
     binary_sensor::BinarySensor *motion_binary_sensor_{nullptr};
