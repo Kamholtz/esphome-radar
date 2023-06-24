@@ -172,14 +172,21 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
                 address_code_2 == 0x06) {
 
               // each byte equal?
-              bool all_equal = std::equal(motion_amplitude_prev.data, motion_amplitude_prev.data + DATA_MAX_LEN, float_data_curr_union.data);
+              bool all_equal = true;
+              all_equal &= (motion_amplitude_prev.data[0] == float_data_curr_union.data[0]);
+              all_equal &= (motion_amplitude_prev.data[1] == float_data_curr_union.data[1]);
+              all_equal &= (motion_amplitude_prev.data[2] == float_data_curr_union.data[2]);
+              all_equal &= (motion_amplitude_prev.data[3] == float_data_curr_union.data[3]);
 
               if (!all_equal) {
                 ESP_LOGD(TAG, "motion_amplitude: %f", float_data_curr_union.f);
                 this->motion_amplitude_sensor_->publish_state(float_data_curr_union.f);
                 
                 // cache for comparison later
-                std::memcpy(motion_amplitude_prev.data, float_data_curr_union.data, 4);
+                motion_amplitude_prev.data[0] = float_data_curr_union.data[0];
+                motion_amplitude_prev.data[1] = float_data_curr_union.data[1];
+                motion_amplitude_prev.data[2] = float_data_curr_union.data[2];
+                motion_amplitude_prev.data[3] = float_data_curr_union.data[3];
               }
             }
 
