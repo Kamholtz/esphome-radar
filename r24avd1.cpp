@@ -130,153 +130,154 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
     return pos;
   } 
 
-  if (pos > (pkt_len_incl_start - 1)) {
-    const uint8_t function_code = buffer[FUNCTION_CODE_IDX];
-    const uint8_t address_code_1 = buffer[ADDRESS_CODE_1_IDX];
-    const uint8_t address_code_2 = buffer[ADDRESS_CODE_2_IDX];
-    const uint8_t crc_l_idx = pkt_len_incl_start - 2;
-    const uint8_t crc_l = buffer[crc_l_idx];
-    const uint8_t crc_h = buffer[crc_l_idx + 1];
-    const uint8_t data_len = crc_l_idx - DATA_START_IDX;
+  if (pos <= (pkt_len_incl_start - 1)) {
+    return pos;
+  }
 
-    //TODO: check CRC is valid
-    
-    ESP_LOGD(TAG, "function_code: %X, address_code_1: %X, address_code_2: %X, crc_l: %X, crc_h: %X, data_len: %d", function_code, address_code_1, address_code_2, crc_l, crc_h, data_len);
 
-    uint16_t calculated_crc = crc::us_calculate_crc16(buffer, pkt_len_incl_start - CRC_LEN);
-    if ((((calculated_crc >> 8) & 0xFF) == crc_l) &&
-        (((calculated_crc & 0xFF)) == crc_h)) {
-      //Complete packet obtained
+  const uint8_t function_code = buffer[FUNCTION_CODE_IDX];
+  const uint8_t address_code_1 = buffer[ADDRESS_CODE_1_IDX];
+  const uint8_t address_code_2 = buffer[ADDRESS_CODE_2_IDX];
+  const uint8_t crc_l_idx = pkt_len_incl_start - 2;
+  const uint8_t crc_l = buffer[crc_l_idx];
+  const uint8_t crc_h = buffer[crc_l_idx + 1];
+  const uint8_t data_len = crc_l_idx - DATA_START_IDX;
 
-      if (data_len > DATA_MAX_LEN) {
-        // Invalid
-        ESP_LOGI(TAG, "Data len (%d) too long, discarding", data_len);
+  ESP_LOGD(TAG, "function_code: %X, address_code_1: %X, address_code_2: %X, crc_l: %X, crc_h: %X, data_len: %d", function_code, address_code_1, address_code_2, crc_l, crc_h, data_len);
 
+  uint16_t calculated_crc = crc::us_calculate_crc16(buffer, pkt_len_incl_start - CRC_LEN);
+  if ((((calculated_crc >> 8) & 0xFF) == crc_l) &&
+      (((calculated_crc & 0xFF)) == crc_h)) {
+    //Complete packet obtained
+
+    if (data_len > DATA_MAX_LEN) {
+      // Invalid
+      ESP_LOGI(TAG, "Data len (%d) too long, discarding", data_len);
+
+    } else {
+
+      // Is this packet different to the last?
+      bool is_packet_equal = std::equal(buffer,buffer + data_len, prev_buffer);
+      if (is_packet_equal) {
+        ESP_LOGD(TAG, "This packet is equivalent to the last packet");
       } else {
+        std:memcpy(prev_buffer, buffer, data_len);
+      }
 
-        // Is this packet different to the last?
-        bool is_packet_equal = std::equal(buffer,buffer + data_len, prev_buffer);
-        if (is_packet_equal) {
-          ESP_LOGD(TAG, "This packet is equivalent to the last packet");
-        } else {
-          std:memcpy(prev_buffer, buffer, data_len);
-        }
-
-        // we don't expect data_len to be larger than a 4 byte float
-        float_data motion_amplitude_prev;
-        float_data float_data_curr_union;
-        std::memcpy(float_data_curr_union.data, (buffer + DATA_START_IDX), data_len);
-        ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_curr_union.data[0], float_data_curr_union.data[1], float_data_curr_union.data[2], float_data_curr_union.data[3]);
+      // we don't expect data_len to be larger than a 4 byte float
+      float_data motion_amplitude_prev;
+      float_data float_data_curr_union;
+      std::memcpy(float_data_curr_union.data, (buffer + DATA_START_IDX), data_len);
+      ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_curr_union.data[0], float_data_curr_union.data[1], float_data_curr_union.data[2], float_data_curr_union.data[3]);
 
 
-        // --- motion amplitude
-        if (this->motion_amplitude_sensor_ != nullptr &&
-            function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
-            address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-            address_code_2 == 0x06) {
+      // --- motion amplitude
+      if (this->motion_amplitude_sensor_ != nullptr &&
+          function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+          address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+          address_code_2 == 0x06) {
 
-          // each byte equal?
-          bool all_equal = true;
-          all_equal &= (motion_amplitude_prev.data[0] == float_data_curr_union.data[0]);
-          all_equal &= (motion_amplitude_prev.data[1] == float_data_curr_union.data[1]);
-          all_equal &= (motion_amplitude_prev.data[2] == float_data_curr_union.data[2]);
-          all_equal &= (motion_amplitude_prev.data[3] == float_data_curr_union.data[3]);
+        // each byte equal?
+        bool all_equal = true;
+        all_equal &= (motion_amplitude_prev.data[0] == float_data_curr_union.data[0]);
+        all_equal &= (motion_amplitude_prev.data[1] == float_data_curr_union.data[1]);
+        all_equal &= (motion_amplitude_prev.data[2] == float_data_curr_union.data[2]);
+        all_equal &= (motion_amplitude_prev.data[3] == float_data_curr_union.data[3]);
 
-          if (!all_equal) {
-            ESP_LOGD(TAG, "motion_amplitude: %f", float_data_curr_union.f);
-            this->motion_amplitude_sensor_->publish_state(float_data_curr_union.f);
-            
-            // cache for comparison later
-            motion_amplitude_prev.data[0] = float_data_curr_union.data[0];
-            motion_amplitude_prev.data[1] = float_data_curr_union.data[1];
-            motion_amplitude_prev.data[2] = float_data_curr_union.data[2];
-            motion_amplitude_prev.data[3] = float_data_curr_union.data[3];
-          }
-        }
-
-        // --- approach status
-        if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
-            address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-            address_code_2 == 0x07) {
-
-          ESP_LOGD(TAG, "approach_status: %X", float_data_curr_union.data[APPROACH_DATA_IDX]);
-
-          const char unknown_string[] = "Unknown";
-          const char none_string[] = "None";
-          const char close_string[] = "Close";
-          const char far_string[] = "Far";
-          char * state_str;
-
-          switch (float_data_curr_union.data[APPROACH_DATA_IDX]) {
-            case (uint8_t)ApproachStatus::NONE:
-              state_str = (char*)none_string;
-              break;
-            case (uint8_t)ApproachStatus::CLOSE:
-              state_str = (char*)close_string;
-              break;
-            case (uint8_t)ApproachStatus::FAR:
-              state_str = (char*)far_string;
-              break;
-            default:
-              state_str = (char*)unknown_string;
-              break;
-          }
-
-          if (this->approach_text_sensor_ != nullptr && this->approach_text_sensor_->get_state() != state_str) {
-            ESP_LOGD(TAG, "Approach: %s", state_str);
-            this->approach_text_sensor_->publish_state(state_str);
-          }
-        }
-
-        // motion/presence 
-        if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
-            address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-            address_code_2 == (uint8_t)AddressCode2::ENVIRONMENT_STATUS) {
-
-
-          bool presence = false;
-          bool motion = false;
-
-          uint32_t status = float_data_curr_union.data[0] << 16 | float_data_curr_union.data[1] << 8 | float_data_curr_union.data[2] << 0;
-          switch (status) {
-            case (uint32_t)EnvironmentStatus::UNMANNED:
-              presence = false;
-              motion = false;
-              break;
-            case (uint32_t)EnvironmentStatus::PRESCENCE:
-              presence = true;
-              motion = false;
-              break;
-            case (uint32_t)EnvironmentStatus::MOTION:
-              presence = true;
-              motion = true;
-              break;
-            default:
-              break;
-          }
-
-          const char false_string[] = "FALSE";
-          const char true_string[] = "TRUE";
-          if (this->motion_binary_sensor_ != nullptr && this->motion_binary_sensor_->state != motion) {
-            ESP_LOGD(TAG, "motion: %s", motion ? true_string : false_string);
-            this->motion_binary_sensor_->publish_state(motion);
-          }
-
-          if (this->presence_binary_sensor_ != nullptr && this->presence_binary_sensor_->state != presence) {
-            ESP_LOGD(TAG, "presence: %s", presence ? true_string : false_string);
-            this->presence_binary_sensor_->publish_state(presence);
-          }
+        if (!all_equal) {
+          ESP_LOGD(TAG, "motion_amplitude: %f", float_data_curr_union.f);
+          this->motion_amplitude_sensor_->publish_state(float_data_curr_union.f);
+          
+          // cache for comparison later
+          motion_amplitude_prev.data[0] = float_data_curr_union.data[0];
+          motion_amplitude_prev.data[1] = float_data_curr_union.data[1];
+          motion_amplitude_prev.data[2] = float_data_curr_union.data[2];
+          motion_amplitude_prev.data[3] = float_data_curr_union.data[3];
         }
       }
 
-    } else {
-      ESP_LOGD(TAG, "CRC failed %X", calculated_crc);
+      // --- approach status
+      if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+          address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+          address_code_2 == 0x07) {
+
+        ESP_LOGD(TAG, "approach_status: %X", float_data_curr_union.data[APPROACH_DATA_IDX]);
+
+        const char unknown_string[] = "Unknown";
+        const char none_string[] = "None";
+        const char close_string[] = "Close";
+        const char far_string[] = "Far";
+        char * state_str;
+
+        switch (float_data_curr_union.data[APPROACH_DATA_IDX]) {
+          case (uint8_t)ApproachStatus::NONE:
+            state_str = (char*)none_string;
+            break;
+          case (uint8_t)ApproachStatus::CLOSE:
+            state_str = (char*)close_string;
+            break;
+          case (uint8_t)ApproachStatus::FAR:
+            state_str = (char*)far_string;
+            break;
+          default:
+            state_str = (char*)unknown_string;
+            break;
+        }
+
+        if (this->approach_text_sensor_ != nullptr && this->approach_text_sensor_->get_state() != state_str) {
+          ESP_LOGD(TAG, "Approach: %s", state_str);
+          this->approach_text_sensor_->publish_state(state_str);
+        }
+      }
+
+      // motion/presence 
+      if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+          address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+          address_code_2 == (uint8_t)AddressCode2::ENVIRONMENT_STATUS) {
+
+
+        bool presence = false;
+        bool motion = false;
+
+        uint32_t status = float_data_curr_union.data[0] << 16 | float_data_curr_union.data[1] << 8 | float_data_curr_union.data[2] << 0;
+        switch (status) {
+          case (uint32_t)EnvironmentStatus::UNMANNED:
+            presence = false;
+            motion = false;
+            break;
+          case (uint32_t)EnvironmentStatus::PRESCENCE:
+            presence = true;
+            motion = false;
+            break;
+          case (uint32_t)EnvironmentStatus::MOTION:
+            presence = true;
+            motion = true;
+            break;
+          default:
+            break;
+        }
+
+        const char false_string[] = "FALSE";
+        const char true_string[] = "TRUE";
+        if (this->motion_binary_sensor_ != nullptr && this->motion_binary_sensor_->state != motion) {
+          ESP_LOGD(TAG, "motion: %s", motion ? true_string : false_string);
+          this->motion_binary_sensor_->publish_state(motion);
+        }
+
+        if (this->presence_binary_sensor_ != nullptr && this->presence_binary_sensor_->state != presence) {
+          ESP_LOGD(TAG, "presence: %s", presence ? true_string : false_string);
+          this->presence_binary_sensor_->publish_state(presence);
+        }
+      }
     }
 
-
-    // finished parsing
-    pos = 0;
+  } else {
+    ESP_LOGD(TAG, "CRC failed %X", calculated_crc);
   }
+
+
+  // finished parsing
+  pos = 0;
 
   return pos;
 }
