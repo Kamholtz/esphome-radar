@@ -137,15 +137,18 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
               (((calculated_crc & 0xFF)) == crc_h)) {
 
             if (data_len > DATA_MAX_LEN) {
+              // Invalid
               ESP_LOGI(TAG, "Data len (%d) too long, discarding", data_len);
-            } else  {
+
+            } else {
               // we don't expect data_len to be larger than a 4 byte float
-              float_data float_data_union;
+              float_data float_data_prev_union;
+              float_data float_data_curr_union;
               for (uint8_t data_ii = 0; data_ii < data_len; data_ii++) {
-                float_data_union.data[data_ii] = buffer[DATA_START_IDX + data_ii];
+                float_data_curr_union.data[data_ii] = buffer[DATA_START_IDX + data_ii];
               }
 
-              ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_union.data[0], float_data_union.data[1], float_data_union.data[2], float_data_union.data[3]);
+              ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_curr_union.data[0], float_data_curr_union.data[1], float_data_curr_union.data[2], float_data_curr_union.data[3]);
 
 
               // motion parameter
@@ -153,21 +156,35 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
               if (this->motion_amplitude_sensor_ != nullptr &&
                   function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-                  address_code_2 == 0x06 && 
-                  this->motion_amplitude_sensor_->get_state() != float_data_union.f) {
+                  address_code_2 == 0x06) {
 
-                ESP_LOGD(TAG, "float_data_union: %f", float_data_union.f);
-                this->motion_amplitude_sensor_->publish_state(float_data_union.f);
+                // eqch byte equal?
+                bool all_equal = true;
+                all_equal &= (float_data_prev_union.data[0] == float_data_curr_union.data[0]);
+                all_equal &= (float_data_prev_union.data[1] == float_data_curr_union.data[1]);
+                all_equal &= (float_data_prev_union.data[2] == float_data_curr_union.data[2]);
+                all_equal &= (float_data_prev_union.data[3] == float_data_curr_union.data[3]);
+
+                if (!all_equal) {
+                  ESP_LOGD(TAG, "float_data_union: %f", float_data_curr_union.f);
+                  this->motion_amplitude_sensor_->publish_state(float_data_curr_union.f);
+                  
+                  // cache for comparison later
+                  float_data_prev_union.data[0] = float_data_curr_union.data[0];
+                  float_data_prev_union.data[1] = float_data_curr_union.data[1];
+                  float_data_prev_union.data[2] = float_data_curr_union.data[2];
+                  float_data_prev_union.data[3] = float_data_curr_union.data[3];
+                }
               }
 
               if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == 0x07) {
 
-                ESP_LOGD(TAG, "approach_status: %X", float_data_union.data[APPROACH_DATA_IDX]);
+                ESP_LOGD(TAG, "approach_status: %X", float_data_curr_union.data[APPROACH_DATA_IDX]);
 
                 std::string state_str;
-                switch (float_data_union.data[APPROACH_DATA_IDX]) {
+                switch (float_data_curr_union.data[APPROACH_DATA_IDX]) {
                   case (uint8_t)ApproachStatus::NONE:
                     state_str = "None";
                     break;
@@ -191,12 +208,12 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                   address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
                   address_code_2 == (uint8_t)AddressCode2::ENVIRONMENT_STATUS) {
 
-                ESP_LOGD(TAG, "motion_binary: %X", float_data_union.data[0]);
+                ESP_LOGD(TAG, "motion_binary: %X", float_data_curr_union.data[0]);
 
                 bool presence = false;
                 bool motion = false;
 
-                uint32_t status = float_data_union.data[0] << 16 | float_data_union.data[1] << 8 | float_data_union.data[2] << 0;
+                uint32_t status = float_data_curr_union.data[0] << 16 | float_data_curr_union.data[1] << 8 | float_data_curr_union.data[2] << 0;
                 switch (status) {
                   case (uint32_t)EnvironmentStatus::UNMANNED:
                     presence = false;
@@ -224,7 +241,6 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, int initia
                   this->presence_binary_sensor_->publish_state(presence);
                 }
               }
-
             }
 
           } else {
