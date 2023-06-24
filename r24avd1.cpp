@@ -9,12 +9,21 @@ static const char *const TAG = "r24avd1";
 void R24AVD1Component::setup() {
   // nothing to do
 
+  // This is likely where I need to put the setup
   unsigned char command_data[1] = {0};
   uart::UARTDevice * this_uart = (uart::UARTDevice*)this;
   write_to_uart((unsigned char)FunctionCode::WRITE_COMMAND, (unsigned char)WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)AddressCode2::THRESHOLD_GEAR, command_data, 1, *this_uart);
 }
 void R24AVD1Component::dump_config() {
-  // TODO: implement
+  ESP_LOGCONFIG(TAG, "LD2410:");
+#ifdef USE_BINARY_SENSOR
+  LOG_TEXT_SENSOR("  ", "HasTargetSensor", this->approach_text_sensor_)
+  LOG_BINARY_SENSOR("  ", "MovingSensor", this->motion_binary_sensor_);
+  LOG_BINARY_SENSOR("  ", "StillSensor", this->presence_binary_sensor_);
+#endif
+  // this->get_version_();
+  // ESP_LOGCONFIG(TAG, "  Firmware Version : %u.%u.%u%u%u%u", this->version_[0], this->version_[1], this->version_[2],
+  //               this->version_[3], this->version_[4], this->version_[5]);
 }
 void R24AVD1Component::loop() {
   const int max_line_length = 80;
