@@ -171,7 +171,6 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
 
   #pragma endregion error_checking
 
-  #pragma region log_and_publish
   // cache for next check
   std:memcpy(prev_buffer, buffer, data_len);
 
@@ -184,6 +183,24 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
   ESP_LOGD(TAG, "float_data_union.data: %X %X %X %X", float_data_curr_union.data[0], float_data_curr_union.data[1], float_data_curr_union.data[2], float_data_curr_union.data[3]);
 
 
+#pragma region diagnostics
+  // Dianostics
+  if (this->motion_amplitude_sensor_ != nullptr &&
+      function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+      address_code_1 == (uint8_t)ActiveReportAddressCode1::REPORT_OTHER_INFORMATION &&
+      address_code_2 == (uint8_t)ReportOtherInformation::ABNORMAL_RESET) {
+      ESP_LOGD(TAG, "Abnormal reset detected!");
+  }
+  if (this->motion_amplitude_sensor_ != nullptr &&
+      function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+      address_code_1 == (uint8_t)ActiveReportAddressCode1::REPORT_OTHER_INFORMATION &&
+      address_code_2 == (uint8_t)ReportOtherInformation::INITIALIZATION_SUCCESSFUL) {
+      ESP_LOGD(TAG, "Initialisation successful!");
+  }
+#pragma endregion diagnostics
+
+
+#pragma region sensor_data
   // --- motion amplitude
   if (this->motion_amplitude_sensor_ != nullptr &&
       function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
@@ -244,11 +261,17 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
   }
 
   // motion/presence 
-  if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+  bool is_env_status = (
+      function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
       address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-      address_code_2 == (uint8_t)ReportRadarInformation::ENVIRONMENT_STATUS) {
+      address_code_2 == (uint8_t)ReportRadarInformation::ENVIRONMENT_STATUS);
 
-
+  bool is_heartbeat = (
+        function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
+        address_code_1 == (uint8_t)ActiveReportAddressCode1::REPORT_OTHER_INFORMATION &&
+        address_code_2 == (uint8_t)ReportOtherInformation::HEARTBEAT_PACKET);
+    
+  if (is_env_status || is_heartbeat) {
     bool presence = false;
     bool motion = false;
 
@@ -270,6 +293,10 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
         break;
     }
 
+    if (is_heartbeat) {
+      ESP_LOGD(TAG, "heartbeat");
+    }
+
     const char false_string[] = "FALSE";
     const char true_string[] = "TRUE";
     if (this->motion_binary_sensor_ != nullptr && this->motion_binary_sensor_->state != motion) {
@@ -282,7 +309,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
       this->presence_binary_sensor_->publish_state(presence);
     }
   }
-  #pragma endregion log_and_publish
+#pragma endregion sensor_data
 
 
 
