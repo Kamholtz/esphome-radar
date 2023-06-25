@@ -104,8 +104,17 @@ enum class AddressCode2 {
 };
 
 
+enum class ReportRadarInformation {
+    ENVIRONMENT_STATUS = 0x05,
+    MOVEMENT_SIGN_PARAMETER = 0x06,
+    CLOSE_TO_FAR_AWAY_STATE = 0x07,
+};
 
-
+enum class ReportOtherInformation {
+    HEARTBEAT_PACKET = 0x01,
+    ABNORMAL_RESET = 0x02,
+    INITIALIZATION_SUCCESSFUL = 0x0A,
+};
 
 enum class UnmannedStallData0 {
     UNMANNED_NO_COERSION = 0x00,
