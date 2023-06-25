@@ -187,7 +187,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
   // --- motion amplitude
   if (this->motion_amplitude_sensor_ != nullptr &&
       function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
-      address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+      address_code_1 == (uint8_t)ActiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
       address_code_2 == (uint8_t)ReportRadarInformation::MOVEMENT_SIGN_PARAMETER) {
 
     // each byte equal?
@@ -211,7 +211,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
 
   // --- approach status
   if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
-      address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
+      address_code_1 == (uint8_t)ActiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
       address_code_2 == (uint8_t)ReportRadarInformation::CLOSE_TO_FAR_AWAY_STATE) {
 
     ESP_LOGD(TAG, "approach_status: %X", float_data_curr_union.data[APPROACH_DATA_IDX]);
