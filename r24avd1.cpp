@@ -105,7 +105,7 @@ uint16_t R24AVD1Component::write_select_gear_threshold(uint8_t gear_threshold) {
 int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *prev_buffer, int prev_len, int initial_pos) {
   int pos = initial_pos;
 
-  // start error checking
+#pragma region error_checking
   if (readch < 0) {
     return pos;
   } 
@@ -165,10 +165,13 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
   // Is this packet different to the last?
   bool is_packet_equal = std::equal(buffer,buffer + data_len, prev_buffer);
   if (is_packet_equal) {
-    ESP_LOGD(TAG, "...");
+    ESP_LOGD(TAG, "..."); // visual indicator that the device is still operating, but does not produce "noisy" logs
     return pos;
   }     
 
+  #pragma endregion error_checking
+
+  #pragma region log_and_publish
   // cache for next check
   std:memcpy(prev_buffer, buffer, data_len);
 
@@ -185,7 +188,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
   if (this->motion_amplitude_sensor_ != nullptr &&
       function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
       address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-      address_code_2 == 0x06) {
+      address_code_2 == (uint8_t)ReportRadarInformation::MOVEMENT_SIGN_PARAMETER) {
 
     // each byte equal?
     bool all_equal = true;
@@ -209,7 +212,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
   // --- approach status
   if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
       address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-      address_code_2 == 0x07) {
+      address_code_2 == (uint8_t)ReportRadarInformation::CLOSE_TO_FAR_AWAY_STATE) {
 
     ESP_LOGD(TAG, "approach_status: %X", float_data_curr_union.data[APPROACH_DATA_IDX]);
 
@@ -243,7 +246,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
   // motion/presence 
   if (function_code == (uint8_t)FunctionCode::ACTIVELY_REPORT_COMMAND &&
       address_code_1 == (uint8_t)PassiveReportAddressCode1::REPORT_RADAR_INFORMATION &&
-      address_code_2 == (uint8_t)AddressCode2::ENVIRONMENT_STATUS) {
+      address_code_2 == (uint8_t)ReportRadarInformation::ENVIRONMENT_STATUS) {
 
 
     bool presence = false;
@@ -279,6 +282,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
       this->presence_binary_sensor_->publish_state(presence);
     }
   }
+  #pragma endregion log_and_publish
 
 
 
