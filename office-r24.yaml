@@ -45,18 +45,17 @@ select:
      - "Area detection (top mounted) (0x01)"
      - "Toilet (top mounted) (0x02)"
      - "Bedroom (top loading) (0x03)"
-     - "Bedroom (top mounted) (0x04)"
-     - "Bedroom (top mounted) (0x05)"
+     - "Living room (top mounted) (0x04)"
+     - "Office (top mounted) (0x05)"
+     - "Hotel (top loading) (0x06)"
     restore_value: true
     # initial_option: "Default (0x00)"
     optimistic: true
     on_value:
       then:
         - lambda: |-
+            id(radar_id).write_select_scene(i);
             ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
-            uint8_t b[1] = {0};
-            b[0] = i;
-            r24avd1::write_to_uart(0x02, 0x04, 0x10, b, 1, id(uart_id));
 
   - platform: template
     name: "Unmanned stall option"

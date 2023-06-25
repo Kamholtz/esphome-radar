@@ -47,8 +47,9 @@ select:
      - "Area detection (top mounted) (0x01)"
      - "Toilet (top mounted) (0x02)"
      - "Bedroom (top loading) (0x03)"
-     - "Bedroom (top mounted) (0x04)"
-     - "Bedroom (top mounted) (0x05)"
+     - "Living room (top mounted) (0x04)"
+     - "Office (top mounted) (0x05)"
+     - "Hotel (top loading) (0x06)"
     restore_value: true
     # initial_option: "Default (0x00)"
     optimistic: true
