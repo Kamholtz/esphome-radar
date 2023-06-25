@@ -87,11 +87,9 @@ button:
       then:
         - lambda: |-
             ESP_LOGD("packet", "force_into_unmanned_stall: ");
-            uint8_t b[1] = {0};
             auto index = id(select_unmanned_stall).active_index();
             if (index) {
-              b[0] = *index;
-              r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(uart_id));
+              id(radar_id).write_force_unmanned_stall(*index);
             }
 
 number:
@@ -106,9 +104,7 @@ number:
     on_value:
       then:
         - lambda: |-
-            uint8_t b[1] = {0};
-            b[0] = id(gear_threshold).state;
-            r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::THRESHOLD_GEAR, b, 1, id(uart_id));
+            id(radar_id).write_select_gear_threshold(id(gear_threshold).state);
 
 # components only really here because they have to be
 uart:

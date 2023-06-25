@@ -102,6 +102,19 @@ uint16_t R24AVD1Component::write_select_gear_threshold(uint8_t gear_threshold) {
 }
 
 
+uint16_t R24AVD1Component::write_force_unmanned_stall(uint8_t unmanned_stall_option) {
+    uint8_t data[1] = { unmanned_stall_option };
+    uart::UARTDevice * this_uart = (uart::UARTDevice*)this;
+
+    // validate
+    if (unmanned_stall_option >= 0 && unmanned_stall_option <= 8) {
+      return r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, data, 1, *this_uart);
+    }
+
+    return 0;
+}
+
+
 int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *prev_buffer, int prev_len, int initial_pos) {
   int pos = initial_pos;
 

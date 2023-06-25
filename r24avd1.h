@@ -151,6 +151,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
     uint16_t write_select_scene(uint8_t scene);
     uint16_t write_select_gear_threshold(uint8_t gear_threshold);
+    uint16_t write_force_unmanned_stall(uint8_t unmanned_stall_option);
 
     void setup() override;
     void dump_config() override;
