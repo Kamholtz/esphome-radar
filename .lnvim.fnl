@@ -1,14 +1,13 @@
-(module overseer-commands
-  {autoload {a nvim-local-fennel.aniseed.core
-             str nvim-local-fennel.aniseed.string
-             nvim nvim-local-fennel.aniseed.nvim
-             fs aniseed.fs
-             scandir plenary.scandir
-             path plenary.path
-             overseer overseer
-             config-fs config.fs
-             config-overseer config.plugin.overseer
-             esphome config.esphome}})
+(local a (require :nvim-local-fennel.aniseed.core))
+(local str (require :nvim-local-fennel.aniseed.string))
+(local nvim (require :nvim-local-fennel.aniseed.nvim))
+(local fs (require :aniseed.fs))
+(local scandir (require :plenary.scandir))
+(local path (require :plenary.path))
+(local overseer (require :overseer))
+(local config-fs (require :config.fs))
+(local config-overseer (require :config.plugin.overseer))
+(local esphome (require :config.esphome))
 
 (local this-path (vim.fn.expand "%:h"))
 
