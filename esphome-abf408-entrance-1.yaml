@@ -1,21 +1,21 @@
 esphome:
   name: esphome-abf408-entrance-1
+  friendly_name: entrance-radar-r24
   # includes:
   #   - crc.h
   #   - r24avd1.h
   #   - r24avd1.cpp
 
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
 
 external_components: 
   - source:
       type: local
       path: C:/Users/carlk/repos/esphome/esphome/components/
     components: [r24avd1]
-
-esp32:
-  board: esp32dev
-  framework:
-    type: arduino
 
 # Enable logging
 logger:
@@ -37,6 +37,7 @@ wifi:
 # not sure what this is
 captive_portal:
 
+
 select:
   - platform: template
     name: "Scene (0x04, 0x10)"
@@ -55,10 +56,8 @@ select:
     on_value:
       then:
         - lambda: |-
+            id(radar_id).write_select_scene(i);
             ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
-            uint8_t b[1] = {0};
-            b[0] = i;
-            r24avd1::write_to_uart(0x02, 0x04, 0x10, b, 1, id(uart_id));
 
   - platform: template
     name: "Unmanned stall option"
@@ -90,11 +89,9 @@ button:
       then:
         - lambda: |-
             ESP_LOGD("packet", "force_into_unmanned_stall: ");
-            uint8_t b[1] = {0};
             auto index = id(select_unmanned_stall).active_index();
             if (index) {
-              b[0] = *index;
-              r24avd1::write_to_uart((uint8_t)r24avd1::FunctionCode::WRITE_COMMAND, (uint8_t)r24avd1::WriteAddressCode1::SYSTEM_PARAMETER, (uint8_t)r24avd1::AddressCode2::FORCE_INTO_UNMANNED_STALL, b, 1, id(uart_id));
+              id(radar_id).write_force_unmanned_stall(*index);
             }
 
 number:
@@ -109,7 +106,7 @@ number:
     on_value:
       then:
         - lambda: |-
-            r24avd1::write_select_gear_threshold(id(gear_threshold).state);
+            id(radar_id).write_select_gear_threshold(id(gear_threshold).state);
 
 # components only really here because they have to be
 uart:
@@ -120,6 +117,13 @@ uart:
   data_bits: 8
   parity: NONE
   stop_bits: 1
+  # debug:
+  #   direction: BOTH
+  #   dummy_receiver: false
+  #   after:
+  #     delimiter: "\n"
+  #   sequence:
+  #     - lambda: UARTDebug::log_string(direction, bytes); 
 
 binary_sensor:
 
@@ -134,6 +138,11 @@ sensor:
       name: Motion
     has_approach: 
       name: Approach
+    has_motion_amplitude: 
+      name: Motion Amplitude
 
 
 # IMPORTANT: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome
+
+
+# [18:43:41][C][wifi:365]:   IP Address: 192.168.2.197

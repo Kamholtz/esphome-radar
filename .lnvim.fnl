@@ -15,7 +15,8 @@
 (comment
  ;; --- external, downstairs (abf408)
  (esphome.register-esphome-templates "Entrance"
-                                     "esphome-abf408-entrance-1.local" 
+                                     "192.168.2.197" 
+                                     ; "esphome-abf408-entrance-1.local" 
                                      "COM3"
                                      "../r24avd1/esphome-abf408-entrance-1.yaml"
                                      (.. this-path "/../r24avd1-test"))

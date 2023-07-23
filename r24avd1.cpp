@@ -10,10 +10,7 @@ static const char *const TAG = "r24avd1";
 void R24AVD1Component::setup() {
   // nothing to do
 
-  // This is likely where I need to put the setup
-  unsigned char command_data[1] = {0};
-  uart::UARTDevice * this_uart = (uart::UARTDevice*)this;
-  write_to_uart((unsigned char)FunctionCode::WRITE_COMMAND, (unsigned char)WriteAddressCode1::SYSTEM_PARAMETER, (unsigned char)AddressCode2::THRESHOLD_GEAR, command_data, 1, *this_uart);
+  // TODO: set gear threshold + scene here from settings in flash. Maybe they are already set at this point?
 }
 void R24AVD1Component::dump_config() {
   ESP_LOGCONFIG(TAG, "LD2410:");
