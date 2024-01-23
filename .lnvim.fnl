@@ -7,7 +7,7 @@
              path plenary.path
              overseer overseer
              config-fs config.fs
-             config-overseer config.plugin.overseer}})
+             config-overseer config.my-utils.overseer-utils}})
 
 
 
