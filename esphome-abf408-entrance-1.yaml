@@ -1,0 +1,148 @@
+esphome:
+  name: esphome-abf408-entrance-1
+  friendly_name: entrance-radar-r24
+  # includes:
+  #   - crc.h
+  #   - r24avd1.h
+  #   - r24avd1.cpp
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+external_components: 
+  - source:
+      type: local
+      path: C:/Users/carlk/repos/esphome/esphome/components/
+    components: [r24avd1]
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-Abf408"
+    password: "XtB9tpm6aSBQ"
+
+# not sure what this is
+captive_portal:
+
+
+select:
+  - platform: template
+    name: "Scene (0x04, 0x10)"
+    id: select_scene
+    options:
+     - "Default (0x00)"
+     - "Area detection (top mounted) (0x01)"
+     - "Toilet (top mounted) (0x02)"
+     - "Bedroom (top loading) (0x03)"
+     - "Living room (top mounted) (0x04)"
+     - "Office (top mounted) (0x05)"
+     - "Hotel (top loading) (0x06)"
+    restore_value: true
+    # initial_option: "Default (0x00)"
+    optimistic: true
+    on_value:
+      then:
+        - lambda: |-
+            id(radar_id).write_select_scene(i);
+            ESP_LOGD("packet", "select_scene: %s, %d", x.c_str(), i);
+
+  - platform: template
+    name: "Unmanned stall option"
+    id: select_unmanned_stall
+    options:
+     - "no coersion - (0x00)"
+     - "10s - (0X01)"
+     - "30s - (0X02)"
+     - "1min - (0X03)"
+     - "2min - (0X04)"
+     - "5min - (0X05)"
+     - "10min - (0X06)"
+     - "30min - (0X07)"
+     - "60min - (0X08)"
+    # initial_option: "no coersion - (0x00)"
+    restore_value: true
+    optimistic: true
+
+button:
+  - platform: template
+    name: Force unmanned stall
+    id: unmanned_stall_button
+
+    # Optional variables:
+    # find more:
+    # https://icon-sets.iconify.design/mdi/close-circle-outline/
+    icon: "mdi:close-circle-outline"
+    on_press:
+      then:
+        - lambda: |-
+            ESP_LOGD("packet", "force_into_unmanned_stall: ");
+            auto index = id(select_unmanned_stall).active_index();
+            if (index) {
+              id(radar_id).write_force_unmanned_stall(*index);
+            }
+
+number:
+  - platform: template
+    id: gear_threshold
+    name: "Gear Threshold (0x04, 0x0C)"
+    restore_value: true
+    optimistic: true
+    min_value: 1
+    max_value: 10
+    step: 1
+    on_value:
+      then:
+        - lambda: |-
+            id(radar_id).write_select_gear_threshold(id(gear_threshold).state);
+
+# components only really here because they have to be
+uart:
+  id: uart_id
+  tx_pin: 14
+  rx_pin: 27
+  baud_rate: 9600
+  data_bits: 8
+  parity: NONE
+  stop_bits: 1
+  # debug:
+  #   direction: BOTH
+  #   dummy_receiver: false
+  #   after:
+  #     delimiter: "\n"
+  #   sequence:
+  #     - lambda: UARTDebug::log_string(direction, bytes); 
+
+binary_sensor:
+
+text_sensor:
+
+sensor:
+  - platform: r24avd1
+    id: radar_id
+    has_presence: 
+      name: Presence
+    has_motion: 
+      name: Motion
+    has_approach: 
+      name: Approach
+    has_motion_amplitude: 
+      name: Motion Amplitude
+
+
+# IMPORTANT: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome
+
+
+# [18:43:41][C][wifi:365]:   IP Address: 192.168.2.197

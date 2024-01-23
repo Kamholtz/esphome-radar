@@ -4,6 +4,7 @@
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/text_sensor/text_sensor.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
+#include "esphome/components/select/select.h"
 #include "esphome/core/log.h"
 
 
@@ -103,8 +104,17 @@ enum class AddressCode2 {
 };
 
 
+enum class ReportRadarInformation {
+    ENVIRONMENT_STATUS = 0x05,
+    MOVEMENT_SIGN_PARAMETER = 0x06,
+    CLOSE_TO_FAR_AWAY_STATE = 0x07,
+};
 
-
+enum class ReportOtherInformation {
+    HEARTBEAT_PACKET = 0x01,
+    ABNORMAL_RESET = 0x02,
+    INITIALIZATION_SUCCESSFUL = 0x0A,
+};
 
 enum class UnmannedStallData0 {
     UNMANNED_NO_COERSION = 0x00,
@@ -119,19 +129,29 @@ enum class UnmannedStallData0 {
 };
 
 using float_data = union {
-  uint8_t data[4];
+  uint8_t data[DATA_MAX_LEN];
   float f;
 };
+
+#define MAX_PACKET_LEN 50
+
+uint16_t get_packet(uint8_t function_code, uint8_t address_code_1, uint8_t address_code_2, const uint8_t *data, uint16_t data_len, unsigned char *buf_out, uint16_t buf_max_len);
+uint16_t write_to_uart(unsigned char function_code, unsigned char address_code_1, unsigned char address_code_2, unsigned char *data, uint16_t data_len, uart::UARTDevice uart);
 
 class R24AVD1Component : public Component, public uart::UARTDevice {
 
   public:
-    R24AVD1Component(uart::UARTComponent *parent) : uart::UARTDevice(parent) {}
     sensor::Sensor *motion_binary_sensor = new sensor::Sensor();
     void set_motion_binary_sensor(binary_sensor::BinarySensor *sens) { this->motion_binary_sensor_ = sens; };
     void set_presence_binary_sensor(binary_sensor::BinarySensor *sens) { this->presence_binary_sensor_ = sens; };
-    sensor::Sensor *motion_amplitude = new sensor::Sensor();
-    void set_approach_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
+    void set_approach_text_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
+    void set_motion_amplitude_sensor(sensor::Sensor *sens) { this->motion_amplitude_sensor_ = sens; };
+    // TODO: remove
+    void set_scene_select(select::Select *sens) { this->scene_select_ = sens; };
+
+    uint16_t write_select_scene(uint8_t scene);
+    uint16_t write_select_gear_threshold(uint8_t gear_threshold);
+    uint16_t write_force_unmanned_stall(uint8_t unmanned_stall_option);
 
     void setup() override;
     void dump_config() override;
@@ -139,10 +159,13 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
 
   protected:
-    int readline_(int readch, uint8_t *buffer, int len, int initial_pos); 
+    int readline_(int readch, uint8_t *buffer, int len, uint8_t *prev_buffer, int prev_len, int initial_pos); 
     text_sensor::TextSensor *approach_text_sensor_{nullptr};
+    sensor::Sensor *motion_amplitude_sensor_ = {nullptr};
     binary_sensor::BinarySensor *motion_binary_sensor_{nullptr};
     binary_sensor::BinarySensor *presence_binary_sensor_{nullptr};
+    select::Select *scene_select_{nullptr};
+    
 };
 }  // namespace r24avd1
 }  // namespace esphome
