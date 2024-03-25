@@ -37,6 +37,35 @@ wifi:
 # not sure what this is
 captive_portal:
 
+# Example configuration entry
+switch:
+  - platform: gpio
+    # Basic
+    # pin: 26
+    # Advanced
+    pin: 
+      number: 26
+      inverted: true
+      mode:
+        output: true
+        open_drain: false
+    name: "Enable radar switch"
+    id: gpio_radar
+
+  - platform: template
+    name: "Enable Radar"
+    lambda: |-
+      if (id(gpio_radar).state) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - switch.turn_on: gpio_radar
+    turn_off_action:
+      - switch.turn_off: gpio_radar 
+
+
 
 select:
   - platform: template
@@ -123,7 +152,7 @@ uart:
   #   after:
   #     delimiter: "\n"
   #   sequence:
-  #     - lambda: UARTDebug::log_string(direction, bytes); 
+  #     - lambda: UARTDebug::log_hex(direction, bytes, ',');
 
 binary_sensor:
 
@@ -138,8 +167,10 @@ sensor:
       name: Motion
     has_approach: 
       name: Approach
-    has_motion_amplitude: 
+    has_motion_amplitude:
       name: Motion Amplitude
+    has_enable_radar:
+      name: Enable Radar
 
 
 # IMPORTANT: I believe this config exists so that there aren't two copies of the radar module in the build directory which would confuse esphome

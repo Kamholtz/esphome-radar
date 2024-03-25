@@ -13,7 +13,7 @@ void R24AVD1Component::setup() {
   // TODO: set gear threshold + scene here from settings in flash. Maybe they are already set at this point?
 }
 void R24AVD1Component::dump_config() {
-  ESP_LOGCONFIG(TAG, "LD2410:");
+  ESP_LOGCONFIG(TAG, "r24avd1:");
 #ifdef USE_BINARY_SENSOR
   LOG_TEXT_SENSOR("  ", "HasTargetSensor", this->approach_text_sensor_)
   LOG_BINARY_SENSOR("  ", "MovingSensor", this->motion_binary_sensor_);
@@ -85,6 +85,17 @@ uint16_t write_to_uart(unsigned char function_code,
 }
 
 
+uint16_t R24AVD1Component::write_enable_radar(bool enable) {
+  if (enable) {
+    ESP_LOGD(TAG, "write_enable_radar: enable: true");
+  } else {
+    ESP_LOGD(TAG, "write_enable_radar: enable: false");
+  }
+
+  return 0;
+}
+
+
 uint16_t R24AVD1Component::write_select_scene(uint8_t scene) {
     // ESP_LOGD(TAG, "write_select_scene: %s, %d", x.c_str(), scene);
     uint8_t data[1] = { scene };
@@ -118,7 +129,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
 #pragma region error_checking
   if (readch < 0) {
     return pos;
-  } 
+  }
 
   if (pos < len - 1 && ((pos == START_IDX && readch == START_VAL) || pos != 0)) {
     buffer[pos++] = readch;
@@ -130,7 +141,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
   if (pos <= DATA_START_IDX) {
     return pos;
   }
-  
+
   const uint16_t pkt_len = (buffer[ADDRESS_H_IDX] << 8) | buffer[ADDRESS_L_IDX];
   const uint16_t pkt_len_incl_start = pkt_len + 1;
   if (pkt_len_incl_start > PACKET_MAX_LEN) {
@@ -201,7 +212,7 @@ int R24AVD1Component::readline_(int readch, uint8_t *buffer, int len, uint8_t *p
       address_code_1 == (uint8_t)ActiveReportAddressCode1::REPORT_OTHER_INFORMATION &&
       address_code_2 == (uint8_t)ReportOtherInformation::INITIALIZATION_SUCCESSFUL) {
       ESP_LOGD(TAG, "Initialisation successful!");
-      
+
       pos = 0;
       return pos;
   }

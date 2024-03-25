@@ -4,7 +4,8 @@ from esphome.components import uart, binary_sensor, text_sensor, select, sensor 
 from esphome.const import (
     CONF_ID,
     DEVICE_CLASS_PRESENCE,
-    DEVICE_CLASS_MOTION
+    DEVICE_CLASS_MOTION,
+    DEVICE_CLASS_POWER
 )
 
 DEPENDENCIES = ["text_sensor", "binary_sensor"]
@@ -20,6 +21,7 @@ CONF_HAS_MOTION = "has_motion"
 CONF_HAS_APPROACH = "has_approach"
 CONF_HAS_SCENE = "has_scene"
 CONF_HAS_MOTION_AMPLITUDE = "has_motion_amplitude"
+CONF_HAS_ENABLE_RADAR = "has_enable_radar"
 
 
 CONFIG_SCHEMA = (
@@ -33,6 +35,9 @@ CONFIG_SCHEMA = (
             ),
             cv.Optional(CONF_HAS_MOTION): binary_sensor.binary_sensor_schema(
                 device_class=DEVICE_CLASS_MOTION
+            ),
+            cv.Optional(CONF_HAS_ENABLE_RADAR): binary_sensor.binary_sensor_schema(
+                device_class=DEVICE_CLASS_POWER
             ),
             cv.Optional(CONF_HAS_APPROACH): text_sensor.text_sensor_schema(
                 # icon=ICON_ACCURACY # TODO: find icon to use here
@@ -78,6 +83,9 @@ async def to_code(config):
     if CONF_HAS_MOTION in config:
         sens = await binary_sensor.new_binary_sensor(config[CONF_HAS_MOTION])
         cg.add(var.set_motion_binary_sensor(sens))
+    if CONF_HAS_ENABLE_RADAR in config:
+        sens = await binary_sensor.new_binary_sensor(config[CONF_HAS_ENABLE_RADAR])
+        cg.add(var.set_enable_radar_binary_sensor(sens))
     if CONF_HAS_APPROACH in config:
         sens = await text_sensor.new_text_sensor(config[CONF_HAS_APPROACH])
         cg.add(var.set_approach_text_sensor(sens))

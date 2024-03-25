@@ -142,6 +142,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
 
   public:
     sensor::Sensor *motion_binary_sensor = new sensor::Sensor();
+    void set_enable_radar_binary_sensor(binary_sensor::BinarySensor *sens) { this->enable_radar_binary_sensor_ = sens; };
     void set_motion_binary_sensor(binary_sensor::BinarySensor *sens) { this->motion_binary_sensor_ = sens; };
     void set_presence_binary_sensor(binary_sensor::BinarySensor *sens) { this->presence_binary_sensor_ = sens; };
     void set_approach_text_sensor(text_sensor::TextSensor *sens) { this->approach_text_sensor_ = sens; };
@@ -149,6 +150,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     // TODO: remove
     void set_scene_select(select::Select *sens) { this->scene_select_ = sens; };
 
+    uint16_t write_enable_radar(bool enable);
     uint16_t write_select_scene(uint8_t scene);
     uint16_t write_select_gear_threshold(uint8_t gear_threshold);
     uint16_t write_force_unmanned_stall(uint8_t unmanned_stall_option);
@@ -162,6 +164,7 @@ class R24AVD1Component : public Component, public uart::UARTDevice {
     int readline_(int readch, uint8_t *buffer, int len, uint8_t *prev_buffer, int prev_len, int initial_pos); 
     text_sensor::TextSensor *approach_text_sensor_{nullptr};
     sensor::Sensor *motion_amplitude_sensor_ = {nullptr};
+    binary_sensor::BinarySensor *enable_radar_binary_sensor_{nullptr};
     binary_sensor::BinarySensor *motion_binary_sensor_{nullptr};
     binary_sensor::BinarySensor *presence_binary_sensor_{nullptr};
     select::Select *scene_select_{nullptr};
